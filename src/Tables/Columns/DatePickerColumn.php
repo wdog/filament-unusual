@@ -207,7 +207,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
         // Replicate CanBeValidated::getRules() logic.
         $rules = (array) $this->evaluate($this->rules);
 
-        if ( ! in_array('required', $rules)) {
+        if (! in_array('required', $rules)) {
             $rules[] = 'nullable';
         }
 
@@ -346,7 +346,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                  detect unsaved changes and revert on cancel. -->
             <input type="hidden" value="<?= e($state) ?>" x-ref="serverState" />
 
-            <?php if ( ! $isDisabled) { ?>
+            <?php if (! $isDisabled) { ?>
 
                 <!-- READ MODE: visible when `isEditing` is false -->
                 <div
@@ -375,49 +375,52 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                     x-show="isEditing"
                     x-on:click.stop
                     style="display:none"
-                    class="flex items-center gap-1">
-                    <!-- fi-input-wrp / fi-invalid / fi-disabled are Filament's own
-                         CSS hooks so the input inherits panel theming automatically. -->
-                    <div
-                        x-bind:class="{
-                            'fi-disabled': isLoading,
-                            'fi-invalid': error !== undefined,
-                        }"
-                        x-tooltip="
-                            error === undefined
-                                ? false
-                                : {
-                                    content: error,
-                                    theme: $store.theme,
-                                }
-                        "
-                        class="fi-input-wrp">
-                        <div class="fi-input-wrp-content-ctn">
-                            <input <?= $inputAttributes->toHtml() ?> />
+                    class="flex flex-col gap-1">
+                    <div class="flex items-center gap-1">
+                        <!-- fi-input-wrp / fi-invalid / fi-disabled are Filament's own
+                             CSS hooks so the input inherits panel theming automatically. -->
+                        <div
+                            x-bind:class="{
+                                'fi-disabled': isLoading,
+                                'fi-invalid': error !== undefined,
+                            }"
+                            class="fi-input-wrp">
+                            <div class="fi-input-wrp-content-ctn">
+                                <input <?= $inputAttributes->toHtml() ?> />
+                            </div>
                         </div>
+
+                        <!-- Save button -->
+                        <button
+                            type="button"
+                            x-on:click.stop="save()"
+                            x-bind:disabled="isLoading"
+                            class="flex items-center justify-center rounded-md p-1 fi-color-<?= e($this->getAcceptColor()) ?> text-(--color-500) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-400) dark:hover:text-(--color-300) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
+                            title="Save">
+                            <!-- Check / confirm icon (Heroicons mini) -->
+                            <?= e(svg('heroicon-s-check', 'h-4 w-4')) ?>
+                        </button>
+
+                        <!-- Cancel button -->
+                        <button
+                            type="button"
+                            x-on:click.stop="cancelEditing()"
+                            x-bind:disabled="isLoading"
+                            class="flex items-center justify-center rounded-md p-1 fi-color-<?= e($this->getCancelColor()) ?> text-(--color-400) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-500) dark:hover:text-(--color-400) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
+                            title="Cancel">
+                            <!-- X / close icon (Heroicons mini) -->
+                            <?= e(svg('heroicon-s-x-mark', 'h-4 w-4')) ?>
+                        </button>
                     </div>
 
-                    <!-- Save button -->
-                    <button
-                        type="button"
-                        x-on:click.stop="save()"
-                        x-bind:disabled="isLoading"
-                        class="flex items-center justify-center rounded-md p-1 fi-color-<?= e($this->getAcceptColor()) ?> text-(--color-500) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-400) dark:hover:text-(--color-300) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
-                        title="Save">
-                        <!-- Check / confirm icon (Heroicons mini) -->
-                        <?= e(svg('heroicon-s-check', 'h-4 w-4')) ?>
-                    </button>
-
-                    <!-- Cancel button -->
-                    <button
-                        type="button"
-                        x-on:click.stop="cancelEditing()"
-                        x-bind:disabled="isLoading"
-                        class="flex items-center justify-center rounded-md p-1 fi-color-<?= e($this->getCancelColor()) ?> text-(--color-400) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-500) dark:hover:text-(--color-400) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
-                        title="Cancel">
-                        <!-- X / close icon (Heroicons mini) -->
-                        <?= e(svg('heroicon-s-x-mark', 'h-4 w-4')) ?>
-                    </button>
+                    <!-- Validation error message -->
+                    <p
+                        x-show="error !== undefined"
+                        x-text="error"
+                        class="fi-fo-field-wrp-error-message
+                        fi-color-danger text-(--color-400)
+                        text-xs ">
+                    </p>
                 </div>
 
             <?php } else { ?>
