@@ -27,14 +27,8 @@ class MoneyColumn extends TextColumn
      */
     protected string|Closure $currency = 'EUR';
 
-    /**
-     * The number by which the raw DB value is divided before formatting.
-     *   100  → value is stored in cents      (default)
-     *   1000 → value is stored in millicents
-     *   1    → value is already in major units
-     */
-    protected int|Closure $divisor = 100;
 
+    protected int|Closure $decimals = 2;
     /**
      * ICU locale string used for number/symbol formatting.
      * Defaults to the application locale when null.
@@ -56,18 +50,17 @@ class MoneyColumn extends TextColumn
                 return '—';
             }
 
-            $divisor  = $this->evaluate($this->divisor);
             $currency = (string) $this->evaluate($this->currency);
+            $decimals = (int) $this->evaluate($this->decimals);
             $locale   = $this->evaluate($this->locale) ?? app()->getLocale();
 
-            $amount = (int) $state / $divisor;
-
             $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $decimals);
 
-            $formatted = $formatter->formatCurrency($amount, $currency);
+            $formatted = $formatter->formatCurrency($state, $currency);
 
             // NumberFormatter returns false on failure (e.g. unknown currency).
-            return $formatted !== false ? $formatted : number_format($amount, 2) . ' ' . $currency;
+            return $formatted !== false ? $formatted : number_format($state, $decimals) . ' ' . $currency;
         });
     }
 
@@ -83,13 +76,11 @@ class MoneyColumn extends TextColumn
         return $this;
     }
 
-    /**
-     * Divisor applied to the raw DB integer before formatting.
-     * Use 100 for cents (default), 1000 for millicents, 1 for major units.
-     */
-    public function divisor(int|Closure $divisor): static
+
+
+    public function decimals(int|Closure $decimals): static
     {
-        $this->divisor = $divisor;
+        $this->decimals = $decimals;
 
         return $this;
     }
@@ -111,9 +102,9 @@ class MoneyColumn extends TextColumn
         return (string) $this->evaluate($this->currency);
     }
 
-    public function getDivisor(): int
+    public function getDecimals(): string
     {
-        return $this->evaluate($this->divisor);
+        return (int) $this->evaluate($this->decimals);
     }
 
     public function getLocale(): string

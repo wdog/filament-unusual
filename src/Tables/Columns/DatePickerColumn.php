@@ -207,7 +207,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
         // Replicate CanBeValidated::getRules() logic.
         $rules = (array) $this->evaluate($this->rules);
 
-        if (! in_array('required', $rules)) {
+        if ( ! in_array('required', $rules)) {
             $rules[] = 'nullable';
         }
 
@@ -346,7 +346,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                  detect unsaved changes and revert on cancel. -->
             <input type="hidden" value="<?= e($state) ?>" x-ref="serverState" />
 
-            <?php if (! $isDisabled) { ?>
+            <?php if ( ! $isDisabled) { ?>
 
                 <!-- READ MODE: visible when `isEditing` is false -->
                 <div
