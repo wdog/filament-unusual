@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
+/* Dark mode via .dark class on <html> — matches Filament's dark-mode.js */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* dove cercare le classi */
-@source "../views/**/*.blade.php";
-@source "../js/**/*.js";
-@source "../src/**/*.php";
+@source "../../resources/**/*.blade.php";
+@source "../../resources/**/*.js";
+@source "../../src/**/*.php";
 
 /* ── DatePickerColumn ─────────────────────────────────────────────────────── */
 
 .date-picker-column-pencil-button {
-  @apply flex rounded-md p-1 text-sky-500 opacity-50 transition-opacity group-hover:opacity-100 disabled:opacity-50;
+  @apply flex rounded-md p-1 text-sky-500 opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50;
 }
 
 .date-picker-column-save-button {
@@ -52,4 +55,44 @@
 
 .rp-td-action {
     @apply whitespace-nowrap px-3 py-2 text-center text-gray-700 dark:text-gray-200;
+}
+
+.rp-icon-allow {
+    @apply mx-auto h-4 w-4 text-green-500 dark:text-purple-400;
+}
+
+.rp-icon-deny {
+    @apply mx-auto h-4 w-4 text-red-500 dark:text-red-400;
+}
+
+.rp-empty-state {
+    @apply flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500;
+}
+
+.rp-warning-state {
+    @apply flex items-center gap-2 text-sm text-warning-600 dark:text-warning-400;
+}
+
+.rp-state-icon {
+    @apply h-4 w-4 shrink-0;
+}
+
+.rp-table-wrapper {
+    @apply w-full overflow-x-auto rounded-lg ring-1 ring-gray-950/5 dark:ring-white/10;
+}
+
+.rp-table {
+    @apply w-full border-collapse text-xs;
+}
+
+.rp-th-resource {
+    @apply w-full px-3 py-2 text-left font-semibold text-gray-600 dark:text-gray-200;
+}
+
+.rp-th-action {
+    @apply whitespace-nowrap px-3 py-2 text-center font-semibold capitalize text-gray-600 dark:text-gray-200;
+}
+
+.rp-tfoot-cell {
+    @apply px-3 py-1.5 text-gray-400 dark:text-gray-500;
 }
