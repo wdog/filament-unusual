@@ -28,10 +28,10 @@ use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
  *     `x-load` / `x-load-src` so it doesn't block the initial page render.
  *
  * Color system:
- *   Button colors use Filament's own CSS infrastructure instead of dynamic
- *   Tailwind classes. `fi-color-{name}` (from utilities.css) sets `--color-*`
- *   CSS variables; the Tailwind utilities `text-(--color-*)` are static strings
- *   that the scanner always includes. No safelist or class map needed.
+ *   Each button role has a dedicated method (`pencilColorClasses`, etc.) that
+ *   returns a complete, literal Tailwind class string for its Filament color.
+ *   All possible return values are written as string literals so they can be
+ *   pre-compiled into `dist/plugin.css` without relying on the Tailwind scanner.
  */
 class DatePickerColumn extends Column implements Editable, HasEmbeddedView
 {
@@ -207,7 +207,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
         // Replicate CanBeValidated::getRules() logic.
         $rules = (array) $this->evaluate($this->rules);
 
-        if ( ! in_array('required', $rules)) {
+        if (! in_array('required', $rules)) {
             $rules[] = 'nullable';
         }
 
@@ -278,29 +278,6 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
     // -------------------------------------------------------------------------
     // Rendering
     // -------------------------------------------------------------------------
-
-    /**
-     * Maps a Filament color name to its full static `fi-color-*` class string.
-     *
-     * All possible return values are written as complete string literals here so
-     * Tailwind's scanner finds them during `npm run build` and never purges them.
-     * Dynamic concatenation (e.g. `'fi-color-' . $color`) would be invisible to
-     * the scanner in production builds.
-     *
-     * @param  string  $color  One of: warning, success, danger, primary, info, gray
-     */
-    private function colorClass(string $color): string
-    {
-        return match ($color) {
-            'success' => 'fi-color-success',
-            'danger'  => 'fi-color-danger',
-            'primary' => 'fi-color-primary',
-            'info'    => 'fi-color-info',
-            'gray'    => 'fi-color-gray',
-            default   => 'fi-color-warning',
-        };
-    }
-
     /**
      * `HasEmbeddedView` contract: returns the full HTML string for the cell.
      *
@@ -368,23 +345,20 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                  detect unsaved changes and revert on cancel. -->
             <input type="hidden" value="<?= e($state) ?>" x-ref="serverState" />
 
-            <?php if ( ! $isDisabled) { ?>
+            <?php if (! $isDisabled) { ?>
 
                 <!-- READ MODE: visible when `isEditing` is false -->
                 <div
                     x-show="!isEditing"
                     x-on:click.stop="startEditing()"
                     class="flex items-center gap-1.5 cursor-pointer group">
-                    <span class="text-sm text-gray-950 dark:text-white">
+                    <span class="text-sm ">
                         <?= e($humanState) ?>
                     </span>
 
-                    <!-- fi-color-{name} sets --color-* CSS vars (Filament utilities.css).
-                         text-(--color-400) etc. are static strings → always scanned by Tailwind. -->
                     <button
                         type="button"
-
-                        class="opacity-0 group-hover:opacity-100 transition-opacity <?= e($this->colorClass($this->getPencilColor())) ?> text-(--color-400) hover:text-(--color-500) dark:text-(--color-500) dark:hover:text-(--color-400)"
+                        class="date-picker-column-pencil-button"
                         title="Edit date">
                         <!-- Pencil / edit icon (Heroicons mini) -->
                         <?= svg('heroicon-s-pencil', 'h-4 w-4')->toHtml() ?>
@@ -417,10 +391,10 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             type="button"
                             x-on:click.stop="save()"
                             x-bind:disabled="isLoading"
-                            class="flex items-center justify-center rounded-md p-1 <?= e($this->colorClass($this->getAcceptColor())) ?> text-(--color-500) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-400) dark:hover:text-(--color-300) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
+                            class="date-picker-column-save-button"
                             title="Save">
                             <!-- Check / confirm icon (Heroicons mini) -->
-                            <?= svg('heroicon-s-check', 'h-4 w-4')->toHtml() ?>
+                            <?= svg('heroicon-s-check', 'inline h-4 w-4')->toHtml() ?>
                         </button>
 
                         <!-- Cancel button -->
@@ -428,10 +402,10 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             type="button"
                             x-on:click.stop="cancelEditing()"
                             x-bind:disabled="isLoading"
-                            class="flex items-center justify-center rounded-md p-1 <?= e($this->colorClass($this->getCancelColor())) ?> text-(--color-400) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-500) dark:hover:text-(--color-400) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
+                            class="date-picker-column-cancel-button"
                             title="Cancel">
                             <!-- X / close icon (Heroicons mini) -->
-                            <?= svg('heroicon-s-x-mark', 'h-4 w-4')->toHtml() ?>
+                            <?= svg('heroicon-s-x-mark', 'inline h-4 w-4')->toHtml() ?>
                         </button>
                     </div>
 
@@ -439,9 +413,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                     <p
                         x-show="error !== undefined"
                         x-text="error"
-                        class="fi-fo-field-wrp-error-message
-                        fi-color-danger text-(--color-400)
-                        text-xs ">
+                        class="fi-fo-field-wrp-error-message text-red-400 text-xs">
                     </p>
                 </div>
 
