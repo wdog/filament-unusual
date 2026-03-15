@@ -280,6 +280,28 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
     // -------------------------------------------------------------------------
 
     /**
+     * Maps a Filament color name to its full static `fi-color-*` class string.
+     *
+     * All possible return values are written as complete string literals here so
+     * Tailwind's scanner finds them during `npm run build` and never purges them.
+     * Dynamic concatenation (e.g. `'fi-color-' . $color`) would be invisible to
+     * the scanner in production builds.
+     *
+     * @param  string  $color  One of: warning, success, danger, primary, info, gray
+     */
+    private function colorClass(string $color): string
+    {
+        return match ($color) {
+            'success' => 'fi-color-success',
+            'danger'  => 'fi-color-danger',
+            'primary' => 'fi-color-primary',
+            'info'    => 'fi-color-info',
+            'gray'    => 'fi-color-gray',
+            default   => 'fi-color-warning',
+        };
+    }
+
+    /**
      * `HasEmbeddedView` contract: returns the full HTML string for the cell.
      *
      * Two visual states:
@@ -362,7 +384,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                     <button
                         type="button"
 
-                        class="opacity-0 group-hover:opacity-100 transition-opacity fi-color-<?= e($this->getPencilColor()) ?> text-(--color-400) hover:text-(--color-500) dark:text-(--color-500) dark:hover:text-(--color-400)"
+                        class="opacity-0 group-hover:opacity-100 transition-opacity <?= e($this->colorClass($this->getPencilColor())) ?> text-(--color-400) hover:text-(--color-500) dark:text-(--color-500) dark:hover:text-(--color-400)"
                         title="Edit date">
                         <!-- Pencil / edit icon (Heroicons mini) -->
                         <?= e(svg('heroicon-s-pencil', 'h-4 w-4')) ?>
@@ -395,7 +417,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             type="button"
                             x-on:click.stop="save()"
                             x-bind:disabled="isLoading"
-                            class="flex items-center justify-center rounded-md p-1 fi-color-<?= e($this->getAcceptColor()) ?> text-(--color-500) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-400) dark:hover:text-(--color-300) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
+                            class="flex items-center justify-center rounded-md p-1 <?= e($this->colorClass($this->getAcceptColor())) ?> text-(--color-500) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-400) dark:hover:text-(--color-300) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
                             title="Save">
                             <!-- Check / confirm icon (Heroicons mini) -->
                             <?= e(svg('heroicon-s-check', 'h-4 w-4')) ?>
@@ -406,7 +428,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             type="button"
                             x-on:click.stop="cancelEditing()"
                             x-bind:disabled="isLoading"
-                            class="flex items-center justify-center rounded-md p-1 fi-color-<?= e($this->getCancelColor()) ?> text-(--color-400) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-500) dark:hover:text-(--color-400) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
+                            class="flex items-center justify-center rounded-md p-1 <?= e($this->colorClass($this->getCancelColor())) ?> text-(--color-400) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-500) dark:hover:text-(--color-400) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
                             title="Cancel">
                             <!-- X / close icon (Heroicons mini) -->
                             <?= e(svg('heroicon-s-x-mark', 'h-4 w-4')) ?>
