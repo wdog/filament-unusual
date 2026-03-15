@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* dove cercare le classi */
-@source "../../resources/**/*.blade.php";
+@source "../../resources/views/**/*.blade.php";
 @source "../../resources/**/*.js";
 @source "../../src/**/*.php";
 
@@ -25,74 +25,74 @@
 /* ── RolePermissionsSummary ───────────────────────────────────────────────── */
 
 .rp-tr-odd {
-    @apply bg-white dark:bg-gray-900;
+  @apply bg-white dark:bg-gray-900;
 }
 
 .rp-tr-even {
-    @apply bg-gray-50/50 dark:bg-white/5;
+  @apply bg-gray-50/50 dark:bg-white/5;
 }
 
 .rp-tr-separator {
-    @apply border-t border-gray-100 dark:border-white/5;
+  @apply border-t border-gray-100 dark:border-white/5;
 }
 
 .rp-thead-row,
 .rp-tfoot-row {
-    @apply border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5 ;
+  @apply border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5;
 }
 
 .rp-thead-row {
-    @apply border-b;
+  @apply border-b;
 }
 
 .rp-tfoot-row {
-    @apply border-t;
+  @apply border-t;
 }
 
 .rp-td-resource {
-    @apply w-full px-3 py-2 font-medium text-gray-950 dark:text-white;
+  @apply w-full px-3 py-2 font-medium text-gray-950 dark:text-gray-500;
 }
 
 .rp-td-action {
-    @apply whitespace-nowrap px-3 py-2 text-center text-gray-700 dark:text-gray-200;
+  @apply whitespace-nowrap px-3 py-2 text-center text-gray-700 dark:text-gray-200;
 }
 
 .rp-icon-allow {
-    @apply mx-auto h-4 w-4 text-green-500 dark:text-purple-400;
+  @apply mx-auto h-4 w-4 text-green-500 dark:text-purple-400;
 }
 
 .rp-icon-deny {
-    @apply mx-auto h-4 w-4 text-red-500 dark:text-red-400;
+  @apply mx-auto h-4 w-4 text-red-500 dark:text-red-400;
 }
 
 .rp-empty-state {
-    @apply flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500;
+  @apply flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500;
 }
 
 .rp-warning-state {
-    @apply flex items-center gap-2 text-sm text-warning-600 dark:text-warning-400;
+  @apply flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400;
 }
 
 .rp-state-icon {
-    @apply h-4 w-4 shrink-0;
+  @apply h-4 w-4 shrink-0;
 }
 
 .rp-table-wrapper {
-    @apply w-full overflow-x-auto rounded-lg ring-1 ring-gray-950/5 dark:ring-white/10;
+  @apply w-full overflow-x-auto rounded-lg ring-1 ring-gray-950/5 dark:ring-white/10;
 }
 
 .rp-table {
-    @apply w-full border-collapse text-xs;
+  @apply w-full border-collapse text-xs;
 }
 
 .rp-th-resource {
-    @apply w-full px-3 py-2 text-left font-semibold text-gray-600 dark:text-gray-200;
+  @apply w-full px-3 py-2 text-left font-semibold text-gray-600 dark:text-gray-200;
 }
 
 .rp-th-action {
-    @apply whitespace-nowrap px-3 py-2 text-center font-semibold capitalize text-gray-600 dark:text-gray-200;
+  @apply whitespace-nowrap px-3 py-2 text-center font-semibold capitalize text-gray-600 dark:text-gray-200;
 }
 
 .rp-tfoot-cell {
-    @apply px-3 py-1.5 text-gray-400 dark:text-gray-500;
+  @apply px-3 py-1.5 text-gray-400 dark:text-gray-500;
 }
