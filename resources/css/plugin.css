@@ -50,7 +50,7 @@
 }
 
 .rp-td-resource {
-  @apply w-full px-3 py-2 font-medium text-gray-950 dark:text-gray-500;
+  @apply w-full px-3 py-2 font-medium text-gray-950 dark:text-white;
 }
 
 .rp-td-action {
@@ -58,7 +58,7 @@
 }
 
 .rp-icon-allow {
-  @apply mx-auto h-4 w-4 text-green-500 dark:text-purple-400;
+  @apply mx-auto h-4 w-4 text-green-500 dark:text-green-400;
 }
 
 .rp-icon-deny {
