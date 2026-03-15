@@ -1,7 +1,8 @@
 {
   "private": true,
   "devDependencies": {
-    "tailwindcss": "^4.2"
+    "@tailwindcss/cli": "^4.2.1",
+    "tailwindcss": "^4.2.1"
   },
   "scripts": {
     "build": "tailwindcss -i ./resources/css/plugin.css -o ./dist/plugin.css --minify"

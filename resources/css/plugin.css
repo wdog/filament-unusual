@@ -1,4 +1,9 @@
-@tailwind utilities;
+@import "tailwindcss";
+
+/* dove cercare le classi */
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+@source "../src/**/*.php";
 
 /* ── DatePickerColumn ─────────────────────────────────────────────────────── */
 
@@ -12,4 +17,39 @@
 
 .date-picker-column-cancel-button {
   @apply inline rounded-md p-1 text-red-500 transition-opacity disabled:opacity-50;
+}
+
+/* ── RolePermissionsSummary ───────────────────────────────────────────────── */
+
+.rp-tr-odd {
+    @apply bg-white dark:bg-gray-900;
+}
+
+.rp-tr-even {
+    @apply bg-gray-50/50 dark:bg-white/5;
+}
+
+.rp-tr-separator {
+    @apply border-t border-gray-100 dark:border-white/5;
+}
+
+.rp-thead-row,
+.rp-tfoot-row {
+    @apply border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5 ;
+}
+
+.rp-thead-row {
+    @apply border-b;
+}
+
+.rp-tfoot-row {
+    @apply border-t;
+}
+
+.rp-td-resource {
+    @apply w-full px-3 py-2 font-medium text-gray-950 dark:text-white;
+}
+
+.rp-td-action {
+    @apply whitespace-nowrap px-3 py-2 text-center text-gray-700 dark:text-gray-200;
 }

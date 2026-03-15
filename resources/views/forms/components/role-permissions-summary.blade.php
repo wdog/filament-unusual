@@ -15,12 +15,13 @@
             <span class="italic">No permissions assigned to the selected roles.</span>
         </div>
     @else
+
         @php $columns = $getPermissionColumns(); @endphp
 
         <div class="w-full overflow-x-auto rounded-lg ring-1 ring-gray-950/5 dark:ring-white/10">
             <table class="w-full border-collapse text-xs">
                 <thead>
-                    <tr class="border-b border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5">
+                    <tr class="rp-thead-row">
                         <th class="w-full px-3 py-2 text-left font-semibold text-gray-600 dark:text-gray-200">
                             Resource
                         </th>
@@ -35,15 +36,15 @@
                 <tbody>
                     @foreach ($groups as $resource => $actions)
                         <tr @class([
-                            'border-t border-gray-100 dark:border-white/5' => !$loop->first,
-                            'bg-white dark:bg-gray-900' => $loop->odd,
-                            'bg-gray-50/50 dark:bg-white/[0.02]' => $loop->even,
+                            'rp-tr-separator' => ! $loop->first,
+                            'rp-tr-odd'       => $loop->odd,
+                            'rp-tr-even'      => $loop->even,
                         ])>
-                            <td class="w-full px-3 py-2 font-medium text-gray-950 dark:text-white">
+                            <td class="rp-td-resource">
                                 {{ $resource }}
                             </td>
                             @foreach ($columns as $col)
-                                <td class="whitespace-nowrap px-3 py-2 text-center">
+                                <td class="rp-td-action">
                                     @if ($actions->contains($col))
                                         <x-filament::icon icon="heroicon-s-check-circle"
                                             class="mx-auto h-4 w-4 text-green-500 dark:text-green-400" />
@@ -57,7 +58,7 @@
                     @endforeach
                 </tbody>
                 <tfoot>
-                    <tr class="border-t border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5">
+                    <tr class="rp-tfoot-row">
                         <td colspan="{{ count($columns) + 1 }}" class="px-3 py-1.5 text-gray-400 dark:text-gray-500">
                             {{ $groups->sum(fn($a) => $a->count()) }} permissions
                             across {{ $groups->count() }} {{ Str::plural('resource', $groups->count()) }}
