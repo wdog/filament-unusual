@@ -27,8 +27,8 @@ class MoneyColumn extends TextColumn
      */
     protected string|Closure $currency = 'EUR';
 
-
     protected int|Closure $decimals = 2;
+
     /**
      * ICU locale string used for number/symbol formatting.
      * Defaults to the application locale when null.
@@ -75,8 +75,6 @@ class MoneyColumn extends TextColumn
 
         return $this;
     }
-
-
 
     public function decimals(int|Closure $decimals): static
     {
