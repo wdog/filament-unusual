@@ -387,7 +387,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                         class="opacity-0 group-hover:opacity-100 transition-opacity <?= e($this->colorClass($this->getPencilColor())) ?> text-(--color-400) hover:text-(--color-500) dark:text-(--color-500) dark:hover:text-(--color-400)"
                         title="Edit date">
                         <!-- Pencil / edit icon (Heroicons mini) -->
-                        <?= e(svg('heroicon-s-pencil', 'h-4 w-4')) ?>
+                        <?= svg('heroicon-s-pencil', 'h-4 w-4')->toHtml() ?>
                     </button>
                 </div>
 
@@ -420,7 +420,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             class="flex items-center justify-center rounded-md p-1 <?= e($this->colorClass($this->getAcceptColor())) ?> text-(--color-500) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-400) dark:hover:text-(--color-300) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
                             title="Save">
                             <!-- Check / confirm icon (Heroicons mini) -->
-                            <?= e(svg('heroicon-s-check', 'h-4 w-4')) ?>
+                            <?= svg('heroicon-s-check', 'h-4 w-4')->toHtml() ?>
                         </button>
 
                         <!-- Cancel button -->
@@ -431,7 +431,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             class="flex items-center justify-center rounded-md p-1 <?= e($this->colorClass($this->getCancelColor())) ?> text-(--color-400) hover:text-(--color-600) hover:bg-(--color-50) dark:text-(--color-500) dark:hover:text-(--color-400) dark:hover:bg-(--color-950) disabled:opacity-50 transition-colors"
                             title="Cancel">
                             <!-- X / close icon (Heroicons mini) -->
-                            <?= e(svg('heroicon-s-x-mark', 'h-4 w-4')) ?>
+                            <?= svg('heroicon-s-x-mark', 'h-4 w-4')->toHtml() ?>
                         </button>
                     </div>
 
