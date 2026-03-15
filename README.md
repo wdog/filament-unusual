@@ -8,6 +8,7 @@ Extra Filament components and Artisan commands for applications using [Filament 
 - Filament v5
 - bezhansalleh/filament-shield ^4.1
 - spatie/laravel-permission ^6.0
+- PHP `intl` extension with full ICU data (required by `MoneyInput`)
 
 ## Installation
 
@@ -161,6 +162,95 @@ DatePickerColumn::make('locked_until')
 - The stored value can be any format parseable by Carbon (e.g. `Y-m-d`, `Y-m-d H:i:s`, ISO 8601). The column always passes `Y-m-d` to the browser and back to the server.
 - The column reuses Filament's `fi-input` and `fi-input-wrp` CSS classes so it inherits the panel's existing input styling automatically.
 - Requires the `FilamentUnusualPlugin` to be registered so the Alpine JS component is loaded.
+
+---
+
+### `MoneyInput`
+
+A Filament form field for monetary values. Renders a locale-aware formatted input with a currency symbol prefix and an Alpine.js `$money` mask that formats the number as the user types. The stored value is always a plain `float`; formatting is applied only for display.
+
+> **Requires the PHP `intl` extension with full ICU data.**
+> On Debian/Ubuntu: `apt install php-intl icu-devtools`. On Alpine (Docker): `apk add icu-data-full`.
+> Without full ICU data, locale-specific separators and currency symbols may fall back to generic defaults (e.g. `¤` instead of `€`).
+
+**Namespace:** `Wdog\FilamentUnusual\Forms\Components\MoneyInput`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Forms\Components\MoneyInput;
+
+MoneyInput::make('price'),
+
+MoneyInput::make('price')
+    ->currency('USD')
+    ->locale('en_US')
+    ->decimals(2),
+```
+
+**Available methods**
+
+| Method | Default | Description |
+|--------|---------|-------------|
+| `currency(string\|Closure)` | `'EUR'` | ISO 4217 currency code. Controls the symbol prefix and the `formatCurrency()` call. |
+| `locale(string\|Closure\|null)` | app locale | ICU locale string (e.g. `'it_IT'`, `'en_US'`). Determines separators and symbol format. |
+| `decimals(int\|Closure)` | `2` | Number of decimal places shown in the mask and stored value. |
+
+**ICU data and localization**
+
+The currency symbol and separators are resolved via PHP's `NumberFormatter` (ICU). The locale extension syntax `it_IT@currency=EUR` is used internally so that `CURRENCY_SYMBOL` returns the actual glyph (`€`) rather than the generic placeholder (`¤`).
+
+If ICU data is incomplete, the field falls back to the ISO currency code as the prefix (e.g. `EUR`).
+
+**Notes**
+- The field always stores a `float` (or `null` for empty input). Cast your model attribute as `float` or `decimal`.
+- Grouping separators are stripped on dehydration; only the decimal separator is used to parse the raw value back to a float.
+- The Alpine mask is applied client-side via `$money()` (Filament's built-in Alpine money mask).
+
+---
+
+### `MoneyCast`
+
+An Eloquent cast for monetary values stored as integers in the database (e.g. cents). The model exposes the value as a `float` in major units; the cast handles the conversion transparently on read and write.
+
+**Namespace:** `Wdog\FilamentUnusual\Casts\MoneyCast`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Casts\MoneyCast;
+
+// In your model's casts() method:
+protected function casts(): array
+{
+    return [
+        'price'  => MoneyCast::class,          // default: ÷ 100 (cents)
+        'amount' => MoneyCast::class . ':100', // explicit cents
+        'tokens' => MoneyCast::class . ':1000', // millicents or other sub-units
+    ];
+}
+```
+
+**Conversion**
+
+| Direction | Example |
+|-----------|---------|
+| DB → model (get) | `1250` → `12.50` |
+| Model → DB (set) | `12.50` → `1250` |
+
+The `set` side accepts floats, integers, and localised strings. Thousands separators (`.`, space, NBSP) are stripped; commas are treated as decimal separators.
+
+**Pairing with `MoneyInput`**
+
+`MoneyCast` and `MoneyInput` are designed to work together: the cast stores and retrieves the value as a `float`, and `MoneyInput` formats it for display and parses it back to a `float` on dehydration.
+
+```php
+// Model
+'price' => MoneyCast::class,
+
+// Form
+MoneyInput::make('price')->currency('EUR')->locale('it_IT'),
+```
 
 ---
 
