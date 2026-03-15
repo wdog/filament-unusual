@@ -1,8 +1,22 @@
-# wdog/filament-unusual
+# 🦴 wdog/filament-unusual
 
 Extra Filament components and Artisan commands for applications using [Filament Shield](https://github.com/bezhanSalleh/filament-shield).
 
-## Requirements
+## 📑 Contents
+
+- [⚙️ Requirements](#️-requirements)
+- [🚀 Installation](#-installation)
+- [🧩 Components](#-components)
+  - [🔐 RolePermissionsSummary](#-rolePermissionssummary)
+  - [📅 DatePickerColumn](#-datepickercolumn)
+  - [💶 MoneyInput](#-moneyinput)
+  - [💶 MoneyCast](#-moneycast)
+- [🛠️ Commands](#️-commands)
+  - [shield:prune-permissions](#shieldprune-permissions)
+
+---
+
+## ⚙️ Requirements
 
 - PHP 8.2+
 - Filament v5
@@ -10,7 +24,7 @@ Extra Filament components and Artisan commands for applications using [Filament 
 - spatie/laravel-permission ^6.0
 - PHP `intl` extension with full ICU data (required by `MoneyInput`)
 
-## Installation
+## 🚀 Installation
 
 ### 1. Add the path repository to `composer.json`
 
@@ -49,9 +63,9 @@ public function panel(Panel $panel): Panel
 
 ---
 
-## Components
+## 🧩 Components
 
-### `RolePermissionsSummary`
+### 🔐 `RolePermissionsSummary`
 
 A read-only Filament form component that displays a permission matrix for the roles currently selected in the form. It reads the `roles` field value reactively and shows which actions are granted per resource.
 
@@ -83,14 +97,14 @@ Section::make('Permissions')
 - Permissions are parsed from the Filament Shield format (`ViewAny:Role` → resource `Role`, action `view any`).
 - Permissions not matching the Shield format are grouped under `Other`.
 
-**Notes**
-- The component expects the form to have a `roles` field (a multi-select of role IDs).
-- It extends `Filament\Infolists\Components\Entry` and is purely read-only.
-- The default component name is `permissions_summary`.
+> **Notes**
+> - The component expects the form to have a `roles` field (a multi-select of role IDs).
+> - It extends `Filament\Infolists\Components\Entry` and is purely read-only.
+> - The default component name is `permissions_summary`.
 
 ---
 
-### `DatePickerColumn`
+### 📅 `DatePickerColumn`
 
 An editable Filament table column that shows the date as plain text with a small pencil icon on hover. Clicking the pencil reveals an `<input type="date">` (the native date picker opens automatically) with a ✓ save button and ✗ cancel button. Confirming saves directly to the database via Livewire without page navigation or a modal.
 
@@ -158,18 +172,18 @@ DatePickerColumn::make('locked_until')
     ->disabled(fn () => ! auth()->user()->isAdmin()),
 ```
 
-**Notes**
-- The stored value can be any format parseable by Carbon (e.g. `Y-m-d`, `Y-m-d H:i:s`, ISO 8601). The column always passes `Y-m-d` to the browser and back to the server.
-- The column reuses Filament's `fi-input` and `fi-input-wrp` CSS classes so it inherits the panel's existing input styling automatically.
-- Requires the `FilamentUnusualPlugin` to be registered so the Alpine JS component is loaded.
+> **Notes**
+> - The stored value can be any format parseable by Carbon (e.g. `Y-m-d`, `Y-m-d H:i:s`, ISO 8601). The column always passes `Y-m-d` to the browser and back to the server.
+> - The column reuses Filament's `fi-input` and `fi-input-wrp` CSS classes so it inherits the panel's existing input styling automatically.
+> - Requires the `FilamentUnusualPlugin` to be registered so the Alpine JS component is loaded.
 
 ---
 
-### `MoneyInput`
+### 💶 `MoneyInput`
 
 A Filament form field for monetary values. Renders a locale-aware formatted input with a currency symbol prefix and an Alpine.js `$money` mask that formats the number as the user types. The stored value is always a plain `float`; formatting is applied only for display.
 
-> **Requires the PHP `intl` extension with full ICU data.**
+> ⚠️ **Requires the PHP `intl` extension with full ICU data.**
 > On Debian/Ubuntu: `apt install php-intl icu-devtools`. On Alpine (Docker): `apk add icu-data-full`.
 > Without full ICU data, locale-specific separators and currency symbols may fall back to generic defaults (e.g. `¤` instead of `€`).
 
@@ -202,30 +216,38 @@ The currency symbol and separators are resolved via PHP's `NumberFormatter` (ICU
 
 If ICU data is incomplete, the field falls back to the ISO currency code as the prefix (e.g. `EUR`).
 
-**Notes**
-- The field always stores a `float` (or `null` for empty input). Cast your model attribute as `float` or `decimal`.
-- Grouping separators are stripped on dehydration; only the decimal separator is used to parse the raw value back to a float.
-- The Alpine mask is applied client-side via `$money()` (Filament's built-in Alpine money mask).
+> **Notes**
+> - The field always stores a `float` (or `null` for empty input). Cast your model attribute as `float` or `decimal`.
+> - Grouping separators are stripped on dehydration; only the decimal separator is used to parse the raw value back to a float.
+> - The Alpine mask is applied client-side via `$money()` (Filament's built-in Alpine money mask).
 
 ---
 
-### `MoneyCast`
+### 💶 `MoneyCast`
 
 An Eloquent cast for monetary values stored as integers in the database (e.g. cents). The model exposes the value as a `float` in major units; the cast handles the conversion transparently on read and write.
 
 **Namespace:** `Wdog\FilamentUnusual\Casts\MoneyCast`
+
+**🤔 Why store money as integers?**
+
+Floating-point arithmetic is imprecise: `0.1 + 0.2` in PHP equals `0.30000000000000004`, not `0.3`. For monetary values this causes rounding errors that silently corrupt totals. Storing amounts as integers (cents) eliminates the problem entirely — integer arithmetic is exact.
+
+```
+€12.50  →  stored as  1250  (cents, integer, safe ✅)
+€12.50  →  stored as  12.5  (float, unsafe ❌ — do not do this)
+```
 
 **Usage**
 
 ```php
 use Wdog\FilamentUnusual\Casts\MoneyCast;
 
-// In your model's casts() method:
 protected function casts(): array
 {
     return [
-        'price'  => MoneyCast::class,          // default: ÷ 100 (cents)
-        'amount' => MoneyCast::class . ':100', // explicit cents
+        'price'  => MoneyCast::class,           // default ÷ 100 (cents)
+        'amount' => MoneyCast::class . ':100',  // explicit cents
         'tokens' => MoneyCast::class . ':1000', // millicents or other sub-units
     ];
 }
@@ -240,21 +262,36 @@ protected function casts(): array
 
 The `set` side accepts floats, integers, and localised strings. Thousands separators (`.`, space, NBSP) are stripped; commas are treated as decimal separators.
 
-**Pairing with `MoneyInput`**
-
-`MoneyCast` and `MoneyInput` are designed to work together: the cast stores and retrieves the value as a `float`, and `MoneyInput` formats it for display and parses it back to a `float` on dehydration.
+**🔗 Full example — model + form + table**
 
 ```php
-// Model
-'price' => MoneyCast::class,
+// 1. Migration — store cents as integer
+$table->unsignedInteger('price'); // e.g. 1250 = €12.50
 
-// Form
+// 2. Model — cast cents ↔ float automatically
+use Wdog\FilamentUnusual\Casts\MoneyCast;
+
+protected function casts(): array
+{
+    return ['price' => MoneyCast::class];
+}
+
+// 3. Filament resource form — edit the value as a formatted input
+use Wdog\FilamentUnusual\Forms\Components\MoneyInput;
+
 MoneyInput::make('price')->currency('EUR')->locale('it_IT'),
+
+// 4. Filament resource table — display the value as a formatted string
+use Wdog\FilamentUnusual\Tables\Columns\MoneyColumn;
+
+MoneyColumn::make('price')->currency('EUR')->locale('it_IT'),
 ```
+
+`MoneyCast` sits in the middle: the DB column holds `1250`, the model exposes `12.50`, and both `MoneyInput` and `MoneyColumn` receive the float and format it for the user.
 
 ---
 
-## Commands
+## 🛠️ Commands
 
 ### `shield:prune-permissions`
 
