@@ -1,7 +1,7 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "wdog/filament-unusual",
-    "description": "Extra Filament components and commands for Filament Shield.",
+    "description": "Extra Filament v5 form components, table columns, casts, and Artisan commands for applications using Filament Shield.",
     "type": "library",
     "license": "MIT",
     "require": {
