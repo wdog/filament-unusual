@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Filament\Tables\Table;
 use Illuminate\Support\Js;
 use Filament\Tables\Columns\Column;
+use Filament\Support\Enums\Alignment;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Tables\Columns\Contracts\Editable;
 use Filament\Tables\Columns\Concerns\CanBeValidated;
@@ -272,7 +273,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
      */
     public function getHumanState(): string
     {
-        return $this->parsedDate()?->format($this->getDisplayFormat()) ?? '—';
+        return $this->parsedDate()?->format($this->getDisplayFormat()) ?? @svg('heroicon-s-cursor-arrow-rays', 'w-4 h-4')->toHtml();
     }
 
     // -------------------------------------------------------------------------
@@ -315,6 +316,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
             ], escape: false)
             ->class([
                 'fi-ta-date-picker',
+                (($alignment = $this->getAlignment()) instanceof Alignment ? "fi-align-{$alignment->value}" : (is_string($alignment) ? $alignment : '')),
                 'fi-inline' => $this->isInline(),
             ]);
 
@@ -351,9 +353,9 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                 <div
                     x-show="!isEditing"
                     x-on:click.stop="startEditing()"
-                    class="flex items-center gap-1.5 cursor-pointer group">
-                    <span class="text-sm ">
-                        <?= e($humanState) ?>
+                    class="inline-flex gap-1.5 cursor-pointer items-center">
+                    <span class="text-sm">
+                        <?= ($humanState) ?>
                     </span>
 
                     <button
@@ -372,7 +374,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                     x-on:click.stop
                     style="display:none"
                     class="flex flex-col gap-1">
-                    <div class="flex items-center gap-1">
+                    <div class="inline-flex items-center gap-1">
                         <!-- fi-input-wrp / fi-invalid / fi-disabled are Filament's own
                              CSS hooks so the input inherits panel theming automatically. -->
                         <div
@@ -421,7 +423,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
 
                 <!-- DISABLED STATE: just the formatted date, no interaction. -->
                 <span class="text-sm text-gray-950 dark:text-white">
-                    <?= e($humanState) ?>
+                    <?= ($humanState) ?>
                 </span>
 
             <?php } ?>
