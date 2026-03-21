@@ -14,16 +14,21 @@
   @apply w-full;
 }
 
+.date-picker-column-read-btn {
+}
+
 .date-picker-column-pencil-button {
   @apply flex rounded-md p-1 text-sky-500 disabled:opacity-50;
 }
 
 .date-picker-column-save-button {
-  @apply inline rounded-md p-1 text-green-500 disabled:opacity-50;
+  /* @apply inline rounded-md p-1 text-green-500 disabled:opacity-50; */
+  @apply inline-flex items-center rounded-md px-2 border-green-500 border hover:bg-green-300  text-green-500 py-1;
 }
 
 .date-picker-column-cancel-button {
-  @apply inline rounded-md p-1 text-red-500 disabled:opacity-50;
+  /* @apply inline rounded-md p-1 text-red-500 disabled:opacity-50; */
+  @apply inline-flex items-center rounded-md  px-2  border-red-500 border hover:bg-red-300  text-red-500 py-1;
 }
 
 /* ── RolePermissionsSummary ───────────────────────────────────────────────── */

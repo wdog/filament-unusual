@@ -360,7 +360,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                     x-show="!isEditing"
                     x-on:click.stop="startEditing()"
                     class="group flex gap-1.5 cursor-pointer items-center w-full <?= $justifyClass ?>">
-                    <span class="text-sm">
+                    <span class="date-picker-column-read-btn">
                         <?= ($humanState) ?>
                     </span>
 
@@ -379,10 +379,14 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                     x-show="isEditing"
                     x-on:click.stop
                     style="display:none"
-                    class="flex flex-col gap-1">
-                    <div class="inline-flex items-center gap-1">
+                    class="flex gap-1  <?= $justifyClass ?> ">
+                    <div class="gap-x-2 flex">
                         <!-- fi-input-wrp / fi-invalid / fi-disabled are Filament's own
                              CSS hooks so the input inherits panel theming automatically. -->
+
+
+
+
                         <div
                             x-bind:class="{
                                 'fi-disabled': isLoading,
@@ -394,27 +398,30 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             </div>
                         </div>
 
-                        <!-- Save button -->
-                        <button
-                            type="button"
-                            x-on:click.stop="save()"
-                            x-bind:disabled="isLoading"
-                            class="date-picker-column-save-button transition-opacity"
-                            title="Save">
-                            <!-- Check / confirm icon (Heroicons mini) -->
-                            <?= svg('heroicon-s-check', 'inline h-4 w-4')->toHtml() ?>
-                        </button>
+                        <div class="flex w-full gap-x-2 items-center justify-between">
+                            <!-- Save button -->
+                            <button
+                                type="button"
+                                x-on:click.stop="save()"
+                                x-bind:disabled="isLoading"
+                                class="date-picker-column-save-button transition-opacity"
+                                title="Save">
+                                <!-- Check / confirm icon (Heroicons mini) -->
+                                <?= svg('heroicon-s-check', 'inline h-4 w-4')->toHtml() ?>
+                            </button>
 
-                        <!-- Cancel button -->
-                        <button
-                            type="button"
-                            x-on:click.stop="cancelEditing()"
-                            x-bind:disabled="isLoading"
-                            class="date-picker-column-cancel-button transition-opacity"
-                            title="Cancel">
-                            <!-- X / close icon (Heroicons mini) -->
-                            <?= svg('heroicon-s-x-mark', 'inline h-4 w-4')->toHtml() ?>
-                        </button>
+                            <!-- Cancel button -->
+                            <button
+                                type="button"
+                                x-on:click.stop="cancelEditing()"
+                                x-bind:disabled="isLoading"
+                                class="date-picker-column-cancel-button transition-opacity"
+                                title="Cancel">
+                                <!-- X / close icon (Heroicons mini) -->
+                                <?= svg('heroicon-s-x-mark', 'inline h-4 w-4')->toHtml() ?>
+                            </button>
+                        </div>
+
                     </div>
 
                     <!-- Validation error message -->
