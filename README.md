@@ -7,8 +7,9 @@ Extra Filament components and Artisan commands for applications using [Filament 
 - [⚙️ Requirements](#️-requirements)
 - [🚀 Installation](#-installation)
 - [🧩 Components](#-components)
-  - [🔐 RolePermissionsSummary](#-rolePermissionssummary)
+  - [🔐 RolePermissionsSummary](#-rolepermissionssummary)
   - [📅 DatePickerColumn](#-datepickercolumn)
+  - [🗓️ DateIntervalPicker](#️-dateintervalpicker)
   - [💶 MoneyInput](#-moneyinput)
   - [💶 MoneyCast](#-moneycast)
 - [🛠️ Commands](#️-commands)
@@ -176,6 +177,89 @@ DatePickerColumn::make('locked_until')
 > - The stored value can be any format parseable by Carbon (e.g. `Y-m-d`, `Y-m-d H:i:s`, ISO 8601). The column always passes `Y-m-d` to the browser and back to the server.
 > - The column reuses Filament's `fi-input` and `fi-input-wrp` CSS classes so it inherits the panel's existing input styling automatically.
 > - Requires the `FilamentUnusualPlugin` to be registered so the Alpine JS component is loaded.
+
+---
+
+### 🗓️ `DateIntervalPicker`
+
+A Filament form field for navigating dates by interval using `‹` / `›` arrow buttons. Displays the date as human-readable text (locale-aware); the stored value is always a normalized string whose format depends on the configured step.
+
+**UX:** `[‹]  lunedì 14 luglio 2025  [›]`
+
+The text input is read-only — navigation is only possible via the arrow buttons.
+
+**Namespace:** `Wdog\FilamentUnusual\Forms\Components\DateIntervalPicker`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Forms\Components\DateIntervalPicker;
+
+DateIntervalPicker::make('expire_at'),
+
+DateIntervalPicker::make('expire_at')
+    ->step('month')
+    ->locale('it'),
+```
+
+**Available methods**
+
+| Method | Default | Description |
+|--------|---------|-------------|
+| `step(string\|Closure)` | `'day'` | Navigation unit: `'day'`, `'week'`, `'month'`, `'year'`. |
+| `locale(string\|Closure\|null)` | app locale | ICU locale for the display text (e.g. `'it'`, `'en'`, `'fr'`). |
+| `displayFormat(string\|Closure)` | *(per step)* | Override the display format using Carbon isoFormat tokens. See defaults below. |
+
+**Default display formats per step**
+
+| Step | Stored as | Display example |
+|------|-----------|-----------------|
+| `day` | `Y-m-d` | `14/07/2025` |
+| `week` | `Y-m-d` (Monday) | `14 - 20 lug 2025` |
+| `month` | `Y-m` | `luglio 2025` |
+| `year` | `Y` | `2025` |
+
+Week display adapts automatically:
+- Same month → `12 - 18 lug 2025`
+- Different months → `28 lug - 3 ago 2025`
+- Different years → `30 dic 2025 - 5 gen 2026`
+
+**Supported `displayFormat` tokens**
+
+`dddd` `ddd` `YYYY` `YY` `MMMM` `MMM` `MM` `M` `DD` `D`
+
+**Examples**
+
+```php
+// Day step with Italian locale (default display: DD/MM/YYYY)
+DateIntervalPicker::make('expire_at')
+    ->locale('it'),
+
+// Month step → stored as "2025-07", displayed as "luglio 2025"
+DateIntervalPicker::make('period')
+    ->step('month'),
+
+// Year step → stored as "2025", displayed as "2025"
+DateIntervalPicker::make('year')
+    ->step('year'),
+
+// Week step → stored as Monday Y-m-d, displayed as range
+DateIntervalPicker::make('week_start')
+    ->step('week'),
+
+// Custom display format
+DateIntervalPicker::make('expire_at')
+    ->displayFormat('D MMM YYYY'),   // e.g. "14 lug 2025"
+
+// Disabled
+DateIntervalPicker::make('expire_at')
+    ->disabled(),
+```
+
+> **Notes**
+> - `week` always stores the Monday of the selected week.
+> - `month` stores only `Y-m`; `year` stores only `Y`. Ensure your database column / model cast accepts these formats.
+> - The component uses a hidden `wire:model` input to sync with Livewire on form submission (deferred, no extra requests on every click).
 
 ---
 

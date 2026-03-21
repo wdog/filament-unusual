@@ -23,6 +23,7 @@ class FilamentUnusualServiceProvider extends ServiceProvider
             [
                 Css::make('filament-unusual', __DIR__ . '/../dist/plugin.css'),
                 AlpineComponent::make('columns/date-picker', __DIR__ . '/../dist/components/columns/date-picker.js'),
+                AlpineComponent::make('forms/date-interval-picker', __DIR__ . '/../dist/components/forms/date-interval-picker.js'),
             ],
             'wdog/filament-unusual'
         );

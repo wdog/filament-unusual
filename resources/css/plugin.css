@@ -31,6 +31,28 @@
   @apply inline-flex items-center rounded-md  px-2  border-red-500 border hover:bg-red-300  text-red-500 py-1;
 }
 
+/* ── DateIntervalPicker ───────────────────────────────────────────────────── */
+
+.date-interval-picker {
+  @apply w-full;
+}
+
+.date-interval-picker-row {
+  @apply flex items-center gap-1;
+}
+
+.date-interval-picker-nav-btn {
+  @apply flex items-center justify-center rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200 disabled:opacity-50 transition-colors;
+}
+
+.date-interval-picker-input {
+  @apply flex-1 min-w-0 text-sm text-center;
+}
+
+.date-interval-picker-display-disabled {
+  @apply text-sm text-gray-950 dark:text-white;
+}
+
 /* ── RolePermissionsSummary ───────────────────────────────────────────────── */
 
 .rp-tr-odd {
