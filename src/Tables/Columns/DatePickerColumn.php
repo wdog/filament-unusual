@@ -353,14 +353,14 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                 <div
                     x-show="!isEditing"
                     x-on:click.stop="startEditing()"
-                    class="inline-flex gap-1.5 cursor-pointer items-center">
+                    class="group flex gap-1.5 cursor-pointer items-center">
                     <span class="text-sm">
                         <?= ($humanState) ?>
                     </span>
 
                     <button
                         type="button"
-                        class="date-picker-column-pencil-button"
+                        class="date-picker-column-pencil-button opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Edit date">
                         <!-- Pencil / edit icon (Heroicons mini) -->
                         <?= svg('heroicon-s-pencil', 'h-4 w-4')->toHtml() ?>
@@ -393,7 +393,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             type="button"
                             x-on:click.stop="save()"
                             x-bind:disabled="isLoading"
-                            class="date-picker-column-save-button"
+                            class="date-picker-column-save-button transition-opacity"
                             title="Save">
                             <!-- Check / confirm icon (Heroicons mini) -->
                             <?= svg('heroicon-s-check', 'inline h-4 w-4')->toHtml() ?>
@@ -404,7 +404,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                             type="button"
                             x-on:click.stop="cancelEditing()"
                             x-bind:disabled="isLoading"
-                            class="date-picker-column-cancel-button"
+                            class="date-picker-column-cancel-button transition-opacity"
                             title="Cancel">
                             <!-- X / close icon (Heroicons mini) -->
                             <?= svg('heroicon-s-x-mark', 'inline h-4 w-4')->toHtml() ?>
