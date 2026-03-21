@@ -338,6 +338,12 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
             ], escape: false)
             ->class(['fi-input text-sm']);
 
+        $justifyClass = match (($alignment = $this->getAlignment()) instanceof Alignment ? $alignment->value : (is_string($alignment) ? $alignment : '')) {
+            'right', 'end'   => 'justify-end',
+            'center'         => 'justify-center',
+            default          => 'justify-start',
+        };
+
         ob_start(); ?>
 
         <div
@@ -353,7 +359,7 @@ class DatePickerColumn extends Column implements Editable, HasEmbeddedView
                 <div
                     x-show="!isEditing"
                     x-on:click.stop="startEditing()"
-                    class="group flex gap-1.5 cursor-pointer items-center">
+                    class="group flex gap-1.5 cursor-pointer items-center w-full <?= $justifyClass ?>">
                     <span class="text-sm">
                         <?= ($humanState) ?>
                     </span>
