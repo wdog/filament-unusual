@@ -4,19 +4,14 @@ namespace Wdog\FilamentUnusual;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use Filament\Support\Facades\FilamentView;
-use Filament\View\PanelsRenderHook;
+use Wdog\FilamentUnusual\Panel\CalculatorFeature;
+use Wdog\FilamentUnusual\Panel\StatsFeature;
 
 class FilamentUnusualPlugin implements Plugin
 {
-    protected bool $showStats = false;
-    protected bool $showCalculator = false;
+    protected ?StatsFeature $statsFeature = null;
 
-    /** @var array<string> */
-    protected array $disabledStats = [];
-
-    /** @var array<array{label: string, value: string|\Closure, icon: string|null, iconClass: string}> */
-    protected array $extraStats = [];
+    protected ?CalculatorFeature $calculatorFeature = null;
 
     public static function make(): static
     {
@@ -30,15 +25,22 @@ class FilamentUnusualPlugin implements Plugin
 
     public function showStats(bool $condition = true): static
     {
-        $this->showStats = $condition;
+        if ($condition) {
+            $this->statsFeature ??= new StatsFeature;
+        } else {
+            $this->statsFeature = null;
+        }
 
         return $this;
     }
 
-
     public function showCalculator(bool $condition = true): static
     {
-        $this->showCalculator = $condition;
+        if ($condition) {
+            $this->calculatorFeature ??= new CalculatorFeature;
+        } else {
+            $this->calculatorFeature = null;
+        }
 
         return $this;
     }
@@ -52,7 +54,7 @@ class FilamentUnusualPlugin implements Plugin
      */
     public function withoutStats(array|string $keys): static
     {
-        $this->disabledStats = array_merge($this->disabledStats, (array) $keys);
+        $this->statsFeature?->withoutStats($keys);
 
         return $this;
     }
@@ -60,10 +62,10 @@ class FilamentUnusualPlugin implements Plugin
     /**
      * Add a custom stat row to the dropdown.
      *
-     * @param  string  $label       Row label.
-     * @param  string|\Closure  $value   Resolved value or a closure returning it.
-     * @param  string|null  $icon    Raw SVG string. Defaults to a generic tag icon.
-     * @param  string  $iconClass   Tailwind colour classes for the icon.
+     * @param  string  $label  Row label.
+     * @param  string|\Closure  $value  Resolved value or a closure returning it.
+     * @param  string|null  $icon  Raw SVG <path> string. Defaults to a generic tag icon.
+     * @param  string  $iconClass  Tailwind colour classes for the icon.
      */
     public function addStat(
         string $label,
@@ -71,7 +73,7 @@ class FilamentUnusualPlugin implements Plugin
         ?string $icon = null,
         string $iconClass = 'text-gray-500 dark:text-gray-400',
     ): static {
-        $this->extraStats[] = compact('label', 'value', 'icon', 'iconClass');
+        $this->statsFeature?->addStat($label, $value, $icon, $iconClass);
 
         return $this;
     }
@@ -83,24 +85,7 @@ class FilamentUnusualPlugin implements Plugin
 
     public function boot(Panel $panel): void
     {
-        if ($this->showStats) {
-            $disabledStats = $this->disabledStats;
-            $extraStats = $this->extraStats;
-
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn() => view('filament-unusual::panel.stats-dropdown', [
-                    'disabledStats' => $disabledStats,
-                    'extraStats' => $extraStats,
-                ]),
-            );
-        }
-
-        if ($this->showCalculator) {
-            FilamentView::registerRenderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn() => view('filament-unusual::panel.calculator-button'),
-            );
-        }
+        $this->statsFeature?->boot($panel);
+        $this->calculatorFeature?->boot($panel);
     }
 }
