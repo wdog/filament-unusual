@@ -4,6 +4,7 @@ namespace Wdog\FilamentUnusual\Tables\Columns;
 
 use Closure;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Columns\Column;
 use Filament\Support\Components\Contracts\HasEmbeddedView;
 
@@ -85,19 +86,17 @@ class PercentageColumn extends Column implements HasEmbeddedView
 
     private function resolveColor(string $color): string
     {
-        // Filament semantic names → panel CSS custom properties.
-        $semantic = match ($color) {
-            'primary' => 'var(--color-primary-500)',
-            'success' => 'var(--color-success-500)',
-            'warning' => 'var(--color-warning-500)',
-            'danger'  => 'var(--color-danger-500)',
-            'info'    => 'var(--color-info-500)',
-            'gray'    => 'var(--color-gray-400)',
-            default   => null,
+        // Filament semantic names → actual color values via FilamentColor registry.
+        $semanticShade = match ($color) {
+            'primary', 'success', 'warning', 'danger', 'info' => 500,
+            'gray' => 400,
+            default => null,
         };
 
-        if ($semantic !== null) {
-            return $semantic;
+        if ($semanticShade !== null) {
+            $palette = FilamentColor::getColor($color);
+
+            return $palette[$semanticShade] ?? $color;
         }
 
         // Already a CSS value: hex (#6366f1), functional (rgb(), hsl()), or var().
