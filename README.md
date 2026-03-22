@@ -84,7 +84,7 @@ All stats configuration is passed via a closure:
 ```php
 FilamentUnusualPlugin::make()
     ->showStats(fn (StatsFeature $stats) => $stats
-        ->withoutStats('ram')
+        ->withoutDefaultStats('ram')
         ->addStat('PHP', PHP_VERSION)
     ),
 ```
@@ -105,15 +105,26 @@ Dark mode is supported automatically.
 
 #### Disabling default rows
 
-Pass one or more keys to `withoutStats()` to hide them:
+Call `withoutDefaultStats()` with no arguments to hide all defaults — only the load time (always visible in the trigger button) remains:
 
 ```php
 FilamentUnusualPlugin::make()
     ->showStats(fn (StatsFeature $stats) => $stats
-        ->withoutStats('livewire')                 // single key
-        ->withoutStats(['ram', 'filament'])         // multiple keys
+        ->withoutDefaultStats()                            // hide ram, laravel, filament, livewire
     ),
 ```
+
+Or pass specific keys to hide individual rows:
+
+```php
+FilamentUnusualPlugin::make()
+    ->showStats(fn (StatsFeature $stats) => $stats
+        ->withoutDefaultStats('livewire')                  // single key
+        ->withoutDefaultStats(['ram', 'filament'])          // multiple keys
+    ),
+```
+
+Available keys: `'ram'`, `'laravel'`, `'filament'`, `'livewire'`. `loadTime` is always shown in the trigger button and cannot be hidden.
 
 #### Adding custom rows
 
@@ -147,7 +158,7 @@ use Wdog\FilamentUnusual\Panel\StatsFeature;
 
 FilamentUnusualPlugin::make()
     ->showStats(fn (StatsFeature $stats) => $stats
-        ->withoutStats(['ram', 'laravel', 'filament', 'livewire'])
+        ->withoutDefaultStats()          // only load time in trigger, no dropdown defaults
         ->addStat('PHP', PHP_VERSION)
     ),
 ```

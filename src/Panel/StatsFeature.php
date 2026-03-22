@@ -8,6 +8,9 @@ use Filament\View\PanelsRenderHook;
 
 class StatsFeature
 {
+    /** Keys for all hideable default stats (loadTime is always shown). */
+    protected const DEFAULT_STATS = ['ram', 'laravel', 'filament', 'livewire'];
+
     /** @var array<string> */
     protected array $disabledStats = [];
 
@@ -16,14 +19,17 @@ class StatsFeature
 
     /**
      * Disable one or more default stat rows.
+     * Call with no arguments to hide all defaults except loadTime (always visible).
      *
-     * Available keys: 'loadTime', 'ram', 'laravel', 'filament', 'livewire'
+     * Available keys: 'ram', 'laravel', 'filament', 'livewire'
      *
      * @param  array<string>|string  $keys
      */
-    public function withoutStats(array|string $keys): static
+    public function withoutDefaultStats(array|string $keys = []): static
     {
-        $this->disabledStats = array_merge($this->disabledStats, (array) $keys);
+        $keys = $keys === [] ? self::DEFAULT_STATS : (array) $keys;
+
+        $this->disabledStats = array_unique(array_merge($this->disabledStats, $keys));
 
         return $this;
     }
