@@ -23,10 +23,16 @@ class FilamentUnusualPlugin implements Plugin
         return 'filament-unusual';
     }
 
-    public function showStats(bool $condition = true): static
+    public function showStats(bool|\Closure $condition = true): static
     {
-        if ($condition) {
+        $enabled = is_bool($condition) ? $condition : true;
+
+        if ($enabled) {
             $this->statsFeature ??= new StatsFeature;
+
+            if ($condition instanceof \Closure) {
+                $condition($this->statsFeature);
+            }
         } else {
             $this->statsFeature = null;
         }
@@ -41,39 +47,6 @@ class FilamentUnusualPlugin implements Plugin
         } else {
             $this->calculatorFeature = null;
         }
-
-        return $this;
-    }
-
-    /**
-     * Disable one or more default stat rows.
-     *
-     * Available keys: 'loadTime', 'ram', 'laravel', 'filament', 'livewire'
-     *
-     * @param  array<string>|string  $keys
-     */
-    public function withoutStats(array|string $keys): static
-    {
-        $this->statsFeature?->withoutStats($keys);
-
-        return $this;
-    }
-
-    /**
-     * Add a custom stat row to the dropdown.
-     *
-     * @param  string  $label  Row label.
-     * @param  string|\Closure  $value  Resolved value or a closure returning it.
-     * @param  string|null  $icon  Raw SVG <path> string. Defaults to a generic tag icon.
-     * @param  string  $iconClass  Tailwind colour classes for the icon.
-     */
-    public function addStat(
-        string $label,
-        string|\Closure $value,
-        ?string $icon = null,
-        string $iconClass = 'text-gray-500 dark:text-gray-400',
-    ): static {
-        $this->statsFeature?->addStat($label, $value, $icon, $iconClass);
 
         return $this;
     }

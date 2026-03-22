@@ -79,6 +79,16 @@ Injects a performance stats dropdown into the panel topbar, just before the glob
 FilamentUnusualPlugin::make()->showStats(),
 ```
 
+All stats configuration is passed via a closure:
+
+```php
+FilamentUnusualPlugin::make()
+    ->showStats(fn (StatsFeature $stats) => $stats
+        ->withoutStats('ram')
+        ->addStat('PHP', PHP_VERSION)
+    ),
+```
+
 The trigger button shows the **page load time** (in ms, bold). Clicking it opens a dropdown with:
 
 ![Stats dropdown](assets/stats.jpg)
@@ -99,21 +109,25 @@ Pass one or more keys to `withoutStats()` to hide them:
 
 ```php
 FilamentUnusualPlugin::make()
-    ->showStats()
-    ->withoutStats('livewire')                    // single key
-    ->withoutStats(['ram', 'filament'])            // multiple keys
+    ->showStats(fn (StatsFeature $stats) => $stats
+        ->withoutStats('livewire')                 // single key
+        ->withoutStats(['ram', 'filament'])         // multiple keys
+    ),
 ```
 
 #### Adding custom rows
 
 ```php
+use Wdog\FilamentUnusual\Panel\StatsFeature;
+
 FilamentUnusualPlugin::make()
-    ->showStats()
-    ->addStat('PHP', PHP_VERSION)
-    ->addStat(
-        label: 'Environment',
-        value: fn () => app()->environment(),
-        iconClass: 'text-green-500 dark:text-green-400',
+    ->showStats(fn (StatsFeature $stats) => $stats
+        ->addStat('PHP', PHP_VERSION)
+        ->addStat(
+            label: 'Environment',
+            value: fn () => app()->environment(),
+            iconClass: 'text-green-500 dark:text-green-400',
+        )
     ),
 ```
 
@@ -129,10 +143,13 @@ FilamentUnusualPlugin::make()
 #### All options combined
 
 ```php
+use Wdog\FilamentUnusual\Panel\StatsFeature;
+
 FilamentUnusualPlugin::make()
-    ->showStats()
-    ->withoutStats(['ram', 'laravel', 'filament', 'livewire']) // only load time in trigger
-    ->addStat('PHP', PHP_VERSION)
+    ->showStats(fn (StatsFeature $stats) => $stats
+        ->withoutStats(['ram', 'laravel', 'filament', 'livewire'])
+        ->addStat('PHP', PHP_VERSION)
+    ),
 ```
 
 ### 🧮 `showCalculator()`
