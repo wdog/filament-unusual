@@ -9,7 +9,7 @@ export default function calculator() {
             window.addEventListener('keydown', (e) => {
                 if (!this.open) { return; }
 
-                if (/[0-9.]/.test(e.key)) {
+                if (/[0-9.,]/.test(e.key)) {
                     this.press(e.key);
                 } else if (e.key === '+' || e.key === '-') {
                     this.press(e.key);
@@ -30,7 +30,7 @@ export default function calculator() {
         },
 
         press(value) {
-            this.display += value;
+            this.display += value === ',' ? '.' : value;
         },
 
         backspace() {
