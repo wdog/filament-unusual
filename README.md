@@ -140,7 +140,11 @@ FilamentUnusualPlugin::make()
 
 ### 🔐 `RolePermissionsSummary`
 
+![RolePermissionsSummary](assets/permissions.jpg)
+
 A read-only Filament form component that displays a permission matrix for the roles currently selected in the form. It reads the `roles` field value reactively and shows which actions are granted per resource.
+
+**Namespace:** `Wdog\FilamentUnusual\Forms\Components\RolePermissionsSummary`
 
 **Usage**
 
@@ -158,8 +162,6 @@ Section::make('Permissions')
         RolePermissionsSummary::make(),
     ]);
 ```
-
-![RolePermissionsSummary](assets/permissions.jpg)
 
 **What it shows**
 
@@ -410,7 +412,9 @@ DateIntervalPicker::make('expire_at')
 > **Notes**
 > - `week` always stores the Monday of the selected week.
 > - `month` stores only `Y-m`; `year` stores only `Y`. Ensure your database column / model cast accepts these formats.
+> - `null` and blank values render the display text as empty; navigation still works and saves a valid date on first click.
 > - The component uses a hidden `wire:model` input to sync with Livewire on form submission (deferred, no extra requests on every click).
+> - Requires the `FilamentUnusualPlugin` to be registered so the Alpine JS component is loaded.
 
 ---
 
@@ -484,6 +488,25 @@ MoneyColumn::make('price')
 | `currency(string\|Closure)` | `'EUR'` | ISO 4217 currency code. |
 | `locale(string\|Closure\|null)` | app locale | ICU locale string (e.g. `'it_IT'`, `'en_US'`). |
 | `decimals(int\|Closure)` | `2` | Decimal places in the formatted output. |
+
+**Examples**
+
+```php
+// Basic usage
+MoneyColumn::make('price'),
+
+// USD with 2 decimal places, right-aligned
+MoneyColumn::make('amount')
+    ->currency('USD')
+    ->locale('en_US')
+    ->alignRight(),
+
+// Sortable with badge style
+MoneyColumn::make('total')
+    ->currency('EUR')
+    ->sortable()
+    ->badge(),
+```
 
 > **Notes**
 > - Expects the column value to be a `float` (major units). Combine with `MoneyCast` to convert from integer cents automatically.
