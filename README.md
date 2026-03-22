@@ -308,6 +308,15 @@ PercentageColumn::make('completion')
 PercentageColumn::make('score')
     ->color(fn (float $state) => $state >= 75 ? 'success' : 'danger'),
 
+// Multiple thresholds with raw CSS colour
+PercentageColumn::make('score')
+    ->color(fn (float $state) => match (true) {
+        $state >= 80 => 'success',
+        $state >= 60 => 'warning',
+        $state >= 40 => 'rgb(99 102 241)',
+        default      => 'danger',
+    }),
+
 // One decimal place
 PercentageColumn::make('accuracy')
     ->decimals(1),
