@@ -12,7 +12,13 @@ class CalculatorFeature
     {
         FilamentView::registerRenderHook(
             PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-            fn () => view('filament-unusual::panel.calculator-button'),
+            fn() => view(
+                'filament-unusual::panel.calculator-button',
+                [
+                    'shortcut' => 'super+c',
+                    'buttonId' => 'global-calculator-button', // utile se vuoi riferirti al DOM
+                ]
+            )
         );
     }
 }
