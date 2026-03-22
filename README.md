@@ -324,6 +324,11 @@ PercentageColumn::make('accuracy')
     ->decimals(1),
 ```
 
+> **Notes**
+> - Extends `Filament\Tables\Columns\Column` — all standard Filament column methods (`sortable()`, `label()`, `searchable()`, etc.) work normally.
+> - The state value is cast to `float` before rendering. Non-numeric strings resolve to `0.0`.
+> - Filament semantic colours (`'success'`, `'danger'`, etc.) are resolved through `FilamentColor`, so they automatically follow any panel-level colour overrides.
+
 ---
 
 ### 🗓️ `DateIntervalPicker`
