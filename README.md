@@ -258,6 +258,8 @@ DatePickerColumn::make('locked_until')
 
 ### 📊 `PercentageColumn`
 
+![PercentageColumn](assets/percentage-column.jpg)
+
 A read-only table column that displays a numeric value (0–100) as a coloured horizontal progress bar with the percentage label centred on it.
 
 **Namespace:** `Wdog\FilamentUnusual\Tables\Columns\PercentageColumn`
