@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* Dark mode via .dark class on <html> — matches Filament's dark-mode.js */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* dove cercare le classi */
+@source "../../resources/views/**/*.blade.php";
+@source "../../resources/**/*.js";
+@source "../../src/**/*.php";
+
+/* ── DatePickerColumn ─────────────────────────────────────────────────────── */
+
+.fi-ta-date-picker {
+  @apply w-full;
+}
+
+.date-picker-column-read-btn {
+}
+
+.date-picker-column-pencil-button {
+  @apply flex rounded-md p-1 text-sky-500 disabled:opacity-50;
+}
+
+.date-picker-column-save-button {
+  /* @apply inline rounded-md p-1 text-green-500 disabled:opacity-50; */
+  @apply inline-flex items-center rounded-md px-2 border-green-500 border hover:bg-green-300  text-green-500 py-1;
+}
+
+.date-picker-column-cancel-button {
+  /* @apply inline rounded-md p-1 text-red-500 disabled:opacity-50; */
+  @apply inline-flex items-center rounded-md  px-2  border-red-500 border hover:bg-red-300  text-red-500 py-1;
+}
+
+/* ── DateIntervalPicker ───────────────────────────────────────────────────── */
+
+.date-interval-picker {
+  @apply w-full;
+}
+
+.date-interval-picker-row {
+  @apply flex items-center gap-1;
+}
+
+.date-interval-picker-nav-btn {
+  @apply flex items-center justify-center rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200 disabled:opacity-50 transition-colors;
+}
+
+.date-interval-picker-input {
+  @apply flex-1 min-w-0 text-sm text-center;
+}
+
+.date-interval-picker-display-disabled {
+  @apply text-sm text-gray-950 dark:text-white;
+}
+
+/* ── RolePermissionsSummary ───────────────────────────────────────────────── */
+
+.rp-tr-odd {
+  @apply bg-white dark:bg-gray-900;
+}
+
+.rp-tr-even {
+  @apply bg-gray-50/50 dark:bg-white/5;
+}
+
+.rp-tr-separator {
+  @apply border-t border-gray-100 dark:border-white/5;
+}
+
+.rp-thead-row,
+.rp-tfoot-row {
+  @apply border-gray-200 bg-gray-50 dark:border-white/5 dark:bg-white/5;
+}
+
+.rp-thead-row {
+  @apply border-b;
+}
+
+.rp-tfoot-row {
+  @apply border-t;
+}
+
+.rp-td-resource {
+  @apply w-full px-3 py-2 font-medium text-gray-950 dark:text-white;
+}
+
+.rp-td-action {
+  @apply whitespace-nowrap px-3 py-2 text-center text-gray-700 dark:text-gray-200;
+}
+
+.rp-icon-allow {
+  @apply mx-auto h-4 w-4 text-green-500 dark:text-green-400;
+}
+
+.rp-icon-deny {
+  @apply mx-auto h-4 w-4 text-red-500 dark:text-red-400;
+}
+
+.rp-empty-state {
+  @apply flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500;
+}
+
+.rp-warning-state {
+  @apply flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400;
+}
+
+.rp-state-icon {
+  @apply h-4 w-4 shrink-0;
+}
+
+.rp-table-wrapper {
+  @apply w-full overflow-x-auto rounded-lg ring-1 ring-gray-950/5 dark:ring-white/10;
+}
+
+.rp-table {
+  @apply w-full border-collapse text-xs;
+}
+
+.rp-th-resource {
+  @apply w-full px-3 py-2 text-left font-semibold text-gray-600 dark:text-gray-200;
+}
+
+.rp-th-action {
+  @apply whitespace-nowrap px-3 py-2 text-center font-semibold capitalize text-gray-600 dark:text-gray-200;
+}
+
+.rp-tfoot-cell {
+  @apply px-3 py-1.5 text-gray-400 dark:text-gray-500;
+}
+
+/* ── StatsDropdown ────────────────────────────────────────────────────────── */
+
+.fi-stats-wrap {
+  @apply relative flex items-center;
+}
+
+.fi-stats-trigger {
+  @apply flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200 transition-colors cursor-pointer;
+}
+
+.fi-stats-icon {
+  @apply h-4 w-4 shrink-0;
+}
+
+.fi-stats-ms {
+  @apply font-bold tabular-nums;
+}
+
+.fi-stats-unit {
+  @apply font-normal text-xs ms-0.5;
+}
+
+.fi-stats-dropdown {
+  @apply absolute left-0 top-full z-50 mt-1 w-52 origin-top-left rounded-xl bg-white shadow-lg ring-1 ring-gray-950/10 dark:bg-gray-900 dark:ring-white/10 py-1;
+}
+
+.fi-stats-row {
+  @apply flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300;
+}
+
+.fi-stats-row-icon {
+  @apply h-4 w-4 shrink-0;
+}
+
+.fi-stats-row-label {
+  @apply flex-1 text-gray-500 dark:text-gray-400;
+}
+
+.fi-stats-row-value {
+  @apply font-medium tabular-nums text-gray-900 dark:text-white;
+}
+
+.fi-stats-divider {
+  @apply my-1 border-t border-gray-100 dark:border-white/10;
+}

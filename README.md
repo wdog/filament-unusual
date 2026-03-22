@@ -1,0 +1,587 @@
+# 🦴 wdog/filament-unusual
+
+Extra Filament components and Artisan commands for applications using [Filament Shield](https://github.com/bezhanSalleh/filament-shield).
+
+## 📑 Contents
+
+- [⚙️ Requirements](#️-requirements)
+- [🚀 Installation](#-installation)
+- [🔌 Plugin options](#-plugin-options)
+  - [📊 showStats()](#-showstats)
+- [🧩 Components](#-components)
+  - [🔐 RolePermissionsSummary](#-rolepermissionssummary)
+  - [📅 DatePickerColumn](#-datepickercolumn)
+  - [📊 PercentageColumn](#-percentagecolumn)
+  - [🗓️ DateIntervalPicker](#️-dateintervalpicker)
+  - [💶 MoneyInput](#-moneyinput)
+  - [💶 MoneyColumn](#-moneycolumn)
+  - [💶 MoneyCast](#-moneycast)
+- [🛠️ Commands](#️-commands)
+  - [shield:prune-permissions](#shieldprune-permissions)
+
+---
+
+## ⚙️ Requirements
+
+- PHP 8.2+
+- Filament v5
+- bezhansalleh/filament-shield ^4.1
+- spatie/laravel-permission ^6.0
+- PHP `intl` extension with full ICU data (required by `MoneyInput`)
+
+## 🚀 Installation
+
+### 1. Add the path repository to `composer.json`
+
+```json
+"repositories": [
+    {
+        "type": "path",
+        "url": "./packages/filament-unusual",
+        "options": {
+            "symlink": true
+        }
+    }
+]
+```
+
+### 2. Require the package
+
+```bash
+composer require wdog/filament-unusual:@dev
+```
+
+### 3. Register the plugin in your Panel Provider
+
+```php
+use Wdog\FilamentUnusual\FilamentUnusualPlugin;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ...
+        ->plugins([
+            FilamentUnusualPlugin::make(),
+        ]);
+}
+```
+
+---
+
+## 🔌 Plugin options
+
+### 📊 `showStats()`
+
+Injects a performance stats dropdown into the panel topbar, just before the global search input.
+
+```php
+FilamentUnusualPlugin::make()->showStats(),
+```
+
+The trigger button shows the **page load time** (in ms, bold). Clicking it opens a dropdown with:
+
+![Stats dropdown](assets/stats.jpg)
+
+| Key | Info | Source |
+|-----|------|--------|
+| `loadTime` | Load time (trigger) | `microtime(true) - LARAVEL_START` |
+| `ram` | Peak RAM | `memory_get_peak_usage()` |
+| `laravel` | Laravel version | `app()->version()` |
+| `filament` | Filament version | `composer/installed-versions` |
+| `livewire` | Livewire version | `composer/installed-versions` |
+
+Dark mode is supported automatically.
+
+#### Disabling default rows
+
+Pass one or more keys to `withoutStats()` to hide them:
+
+```php
+FilamentUnusualPlugin::make()
+    ->showStats()
+    ->withoutStats('livewire')                    // single key
+    ->withoutStats(['ram', 'filament'])            // multiple keys
+```
+
+#### Adding custom rows
+
+```php
+FilamentUnusualPlugin::make()
+    ->showStats()
+    ->addStat('PHP', PHP_VERSION)
+    ->addStat(
+        label: 'Environment',
+        value: fn () => app()->environment(),
+        iconClass: 'text-green-500 dark:text-green-400',
+    ),
+```
+
+**`addStat()` parameters**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `$label` | `string` | — | Row label. |
+| `$value` | `string\|Closure` | — | Static string or closure returning the value. |
+| `$icon` | `string\|null` | tag icon | Raw SVG `<path>` string for the icon. |
+| `$iconClass` | `string` | `text-gray-500 dark:text-gray-400` | Tailwind colour classes for the icon. |
+
+#### All options combined
+
+```php
+FilamentUnusualPlugin::make()
+    ->showStats()
+    ->withoutStats(['ram', 'laravel', 'filament', 'livewire']) // only load time in trigger
+    ->addStat('PHP', PHP_VERSION)
+```
+
+---
+
+## 🧩 Components
+
+### 🔐 `RolePermissionsSummary`
+
+A read-only Filament form component that displays a permission matrix for the roles currently selected in the form. It reads the `roles` field value reactively and shows which actions are granted per resource.
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Forms\Components\RolePermissionsSummary;
+
+Section::make('Permissions')
+    ->schema([
+        Select::make('roles')
+            ->relationship('roles', 'name')
+            ->multiple()
+            ->preload()
+            ->live(),
+
+        RolePermissionsSummary::make(),
+    ]);
+```
+
+![RolePermissionsSummary](assets/permissions.jpg)
+
+**What it shows**
+
+| Resource | view any | view | create | update | delete |
+|----------|----------|------|--------|--------|--------|
+| Role     | ✓        | ✓    | ✗      | ✗      | ✗      |
+| User     | ✓        | ✓    | ✓      | ✓      | ✗      |
+
+- Column order follows the canonical order defined in `config/filament-shield.php` (`policies.methods` + per-resource overrides in `resources.manage`).
+- Permissions are parsed from the Filament Shield format (`ViewAny:Role` → resource `Role`, action `view any`).
+- Permissions not matching the Shield format are grouped under `Other`.
+
+> **Notes**
+> - The component expects the form to have a `roles` field (a multi-select of role IDs).
+> - It extends `Filament\Infolists\Components\Entry` and is purely read-only.
+> - The default component name is `permissions_summary`.
+
+---
+
+### 📅 `DatePickerColumn`
+
+An editable Filament table column that shows the date as plain text with a small pencil icon on hover. Clicking the pencil reveals an `<input type="date">` (the native date picker opens automatically) with a ✓ save button and ✗ cancel button. Confirming saves directly to the database via Livewire without page navigation or a modal.
+
+**UX flow:** `date label 🖊` → click pencil → calendar opens + `[date input] ✓ ✗` → click ✓ → saved, back to label
+
+![DatePickerColumn](assets/date-picker-column.jpg)
+
+**Icon colors**
+
+| Icon | Color | Meaning |
+|------|-------|---------|
+| ✏ pencil | warning (amber) | Edit |
+| ✓ checkmark | success (green) | Confirm / Save |
+| ✗ X | danger (red) | Cancel |
+
+**Namespace:** `Wdog\FilamentUnusual\Tables\Columns\DatePickerColumn`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Tables\Columns\DatePickerColumn;
+
+DatePickerColumn::make('published_at')
+    ->label('Published')
+    ->sortable(),
+```
+
+**Available methods**
+
+| Method | Description |
+|--------|-------------|
+| `displayFormat(string\|Closure)` | PHP date format for the human-readable label. Defaults to `d/m/Y`. |
+| `timezone(string\|Closure)` | Timezone used when parsing the stored value. Defaults to `config('app.timezone')`. |
+| `rules(array\|Closure)` | Validation rules applied before saving. Defaults to `['date']`. |
+| `updateStateUsing(Closure)` | Override the default Eloquent save with a custom callback. Receives `$state` (Y-m-d string or `null`). |
+| `beforeStateUpdated(Closure)` | Hook called before the value is saved. |
+| `afterStateUpdated(Closure)` | Hook called after the value is saved. |
+| `disabled(bool\|Closure)` | Shows date as read-only text, no pencil icon. |
+
+**Keyboard shortcuts (when input is focused)**
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Save |
+| `Escape` | Cancel |
+
+**Examples**
+
+```php
+// Basic usage
+DatePickerColumn::make('due_date'),
+
+// Custom display format and timezone
+DatePickerColumn::make('expires_at')
+    ->displayFormat('d M Y')   // e.g. "14 Mar 2026"
+    ->timezone('Europe/Rome')
+    ->rules(['date', 'after:today']),
+
+// Custom save logic
+DatePickerColumn::make('published_at')
+    ->updateStateUsing(function (?string $state, Model $record) {
+        $record->publish($state ? Carbon::parse($state) : null);
+    }),
+
+// Disabled for non-admins
+DatePickerColumn::make('locked_until')
+    ->disabled(fn () => ! auth()->user()->isAdmin()),
+```
+
+> **Notes**
+> - The stored value can be any format parseable by Carbon (e.g. `Y-m-d`, `Y-m-d H:i:s`, ISO 8601). The column always passes `Y-m-d` to the browser and back to the server.
+> - The column reuses Filament's `fi-input` and `fi-input-wrp` CSS classes so it inherits the panel's existing input styling automatically.
+> - Requires the `FilamentUnusualPlugin` to be registered so the Alpine JS component is loaded.
+
+---
+
+### 📊 `PercentageColumn`
+
+A read-only table column that displays a numeric value (0–100) as a coloured horizontal progress bar with the percentage label centred on it.
+
+**Namespace:** `Wdog\FilamentUnusual\Tables\Columns\PercentageColumn`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Tables\Columns\PercentageColumn;
+
+PercentageColumn::make('completion'),
+```
+
+**Available methods**
+
+| Method | Default | Description |
+|--------|---------|-------------|
+| `color(string\|Closure\|null)` | `null` (auto) | Bar fill colour. Accepts a Filament semantic name, a CSS value, or a Tailwind colour name. `null` = automatic. |
+| `decimals(int\|Closure)` | `0` | Decimal places shown in the label. |
+
+**Automatic colour thresholds (when `color()` is not set)**
+
+| Range | Colour |
+|-------|--------|
+| 0–33 % | `danger` |
+| 34–66 % | `warning` |
+| 67–100 % | `success` |
+
+**`color()` accepted values**
+
+| Format | Example |
+|--------|---------|
+| Filament semantic | `'success'`, `'danger'`, `'warning'`, `'info'`, `'primary'`, `'gray'` |
+| Tailwind name | `'green'` → `var(--color-green-500)` |
+| Tailwind name + shade | `'green-700'` → `var(--color-green-700)` |
+| CSS hex | `'#6366f1'` |
+| CSS functional | `'rgb(99 102 241)'` |
+| CSS custom property | `'var(--my-color)'` |
+
+**Examples**
+
+```php
+// Auto colour (red → amber → green)
+PercentageColumn::make('score'),
+
+// Fixed semantic colour
+PercentageColumn::make('completion')
+    ->color('primary'),
+
+// Dynamic colour from a closure
+PercentageColumn::make('score')
+    ->color(fn (float $state) => $state >= 75 ? 'success' : 'danger'),
+
+// One decimal place
+PercentageColumn::make('accuracy')
+    ->decimals(1),
+```
+
+---
+
+### 🗓️ `DateIntervalPicker`
+
+A Filament form field for navigating dates by interval using `‹` / `›` arrow buttons. Displays the date as human-readable text (locale-aware); the stored value is always a normalized string whose format depends on the configured step.
+
+**UX:** `[‹]  lunedì 14 luglio 2025  [›]`
+
+The text input is read-only — navigation is only possible via the arrow buttons.
+
+**Namespace:** `Wdog\FilamentUnusual\Forms\Components\DateIntervalPicker`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Forms\Components\DateIntervalPicker;
+
+DateIntervalPicker::make('expire_at'),
+
+DateIntervalPicker::make('expire_at')
+    ->step('month')
+    ->locale('it'),
+```
+
+**Available methods**
+
+| Method | Default | Description |
+|--------|---------|-------------|
+| `step(string\|Closure)` | `'day'` | Navigation unit: `'day'`, `'week'`, `'month'`, `'year'`. |
+| `locale(string\|Closure\|null)` | app locale | ICU locale for the display text (e.g. `'it'`, `'en'`, `'fr'`). |
+| `displayFormat(string\|Closure)` | *(per step)* | Override the display format using Carbon isoFormat tokens. See defaults below. |
+
+**Default display formats per step**
+
+| Step | Stored as | Display example |
+|------|-----------|-----------------|
+| `day` | `Y-m-d` | `14/07/2025` |
+| `week` | `Y-m-d` (Monday) | `14 - 20 lug 2025` |
+| `month` | `Y-m` | `luglio 2025` |
+| `year` | `Y` | `2025` |
+
+Week display adapts automatically:
+- Same month → `12 - 18 lug 2025`
+- Different months → `28 lug - 3 ago 2025`
+- Different years → `30 dic 2025 - 5 gen 2026`
+
+**Supported `displayFormat` tokens**
+
+`dddd` `ddd` `YYYY` `YY` `MMMM` `MMM` `MM` `M` `DD` `D`
+
+**Examples**
+
+```php
+// Day step with Italian locale (default display: DD/MM/YYYY)
+DateIntervalPicker::make('expire_at')
+    ->locale('it'),
+
+// Month step → stored as "2025-07", displayed as "luglio 2025"
+DateIntervalPicker::make('period')
+    ->step('month'),
+
+// Year step → stored as "2025", displayed as "2025"
+DateIntervalPicker::make('year')
+    ->step('year'),
+
+// Week step → stored as Monday Y-m-d, displayed as range
+DateIntervalPicker::make('week_start')
+    ->step('week'),
+
+// Custom display format
+DateIntervalPicker::make('expire_at')
+    ->displayFormat('D MMM YYYY'),   // e.g. "14 lug 2025"
+
+// Disabled
+DateIntervalPicker::make('expire_at')
+    ->disabled(),
+```
+
+> **Notes**
+> - `week` always stores the Monday of the selected week.
+> - `month` stores only `Y-m`; `year` stores only `Y`. Ensure your database column / model cast accepts these formats.
+> - The component uses a hidden `wire:model` input to sync with Livewire on form submission (deferred, no extra requests on every click).
+
+---
+
+### 💶 `MoneyInput`
+
+A Filament form field for monetary values. Renders a locale-aware formatted input with a currency symbol prefix and an Alpine.js `$money` mask that formats the number as the user types. The stored value is always a plain `float`; formatting is applied only for display.
+
+> ⚠️ **Requires the PHP `intl` extension with full ICU data.**
+> On Debian/Ubuntu: `apt install php-intl icu-devtools`. On Alpine (Docker): `apk add icu-data-full`.
+> Without full ICU data, locale-specific separators and currency symbols may fall back to generic defaults (e.g. `¤` instead of `€`).
+
+**Namespace:** `Wdog\FilamentUnusual\Forms\Components\MoneyInput`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Forms\Components\MoneyInput;
+
+MoneyInput::make('price'),
+
+MoneyInput::make('price')
+    ->currency('USD')
+    ->locale('en_US')
+    ->decimals(2),
+```
+
+**Available methods**
+
+| Method | Default | Description |
+|--------|---------|-------------|
+| `currency(string\|Closure)` | `'EUR'` | ISO 4217 currency code. Controls the symbol prefix and the `formatCurrency()` call. |
+| `locale(string\|Closure\|null)` | app locale | ICU locale string (e.g. `'it_IT'`, `'en_US'`). Determines separators and symbol format. |
+| `decimals(int\|Closure)` | `2` | Number of decimal places shown in the mask and stored value. |
+
+**ICU data and localization**
+
+The currency symbol and separators are resolved via PHP's `NumberFormatter` (ICU). The locale extension syntax `it_IT@currency=EUR` is used internally so that `CURRENCY_SYMBOL` returns the actual glyph (`€`) rather than the generic placeholder (`¤`).
+
+If ICU data is incomplete, the field falls back to the ISO currency code as the prefix (e.g. `EUR`).
+
+> **Notes**
+> - The field always stores a `float` (or `null` for empty input). Cast your model attribute as `float` or `decimal`.
+> - Grouping separators are stripped on dehydration; only the decimal separator is used to parse the raw value back to a float.
+> - The Alpine mask is applied client-side via `$money()` (Filament's built-in Alpine money mask).
+
+---
+
+### 💶 `MoneyColumn`
+
+A read-only Filament table column that formats a `float` value as a locale-aware currency string. Built on top of `TextColumn`, so all standard Filament modifiers (`sortable`, `searchable`, `badge`, `summarize`, …) work without extra effort.
+
+**Namespace:** `Wdog\FilamentUnusual\Tables\Columns\MoneyColumn`
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Tables\Columns\MoneyColumn;
+
+MoneyColumn::make('price'),
+
+MoneyColumn::make('price')
+    ->currency('USD')
+    ->locale('en_US')
+    ->decimals(2),
+```
+
+**Available methods**
+
+| Method | Default | Description |
+|--------|---------|-------------|
+| `currency(string\|Closure)` | `'EUR'` | ISO 4217 currency code. |
+| `locale(string\|Closure\|null)` | app locale | ICU locale string (e.g. `'it_IT'`, `'en_US'`). |
+| `decimals(int\|Closure)` | `2` | Decimal places in the formatted output. |
+
+> **Notes**
+> - Expects the column value to be a `float` (major units). Combine with `MoneyCast` to convert from integer cents automatically.
+> - Returns `—` for blank/null values.
+> - Requires the PHP `intl` extension (same as `MoneyInput`).
+
+---
+
+### 💶 `MoneyCast`
+
+An Eloquent cast for monetary values stored as integers in the database (e.g. cents). The model exposes the value as a `float` in major units; the cast handles the conversion transparently on read and write.
+
+**Namespace:** `Wdog\FilamentUnusual\Casts\MoneyCast`
+
+**🤔 Why store money as integers?**
+
+Floating-point arithmetic is imprecise: `0.1 + 0.2` in PHP equals `0.30000000000000004`, not `0.3`. For monetary values this causes rounding errors that silently corrupt totals. Storing amounts as integers (cents) eliminates the problem entirely — integer arithmetic is exact.
+
+```
+€12.50  →  stored as  1250  (cents, integer, safe ✅)
+€12.50  →  stored as  12.5  (float, unsafe ❌ — do not do this)
+```
+
+**Usage**
+
+```php
+use Wdog\FilamentUnusual\Casts\MoneyCast;
+
+protected function casts(): array
+{
+    return [
+        'price'  => MoneyCast::class,           // default ÷ 100 (cents)
+        'amount' => MoneyCast::class . ':100',  // explicit cents
+        'tokens' => MoneyCast::class . ':1000', // millicents or other sub-units
+    ];
+}
+```
+
+**Conversion**
+
+| Direction | Example |
+|-----------|---------|
+| DB → model (get) | `1250` → `12.50` |
+| Model → DB (set) | `12.50` → `1250` |
+
+The `set` side accepts floats, integers, and localised strings. Thousands separators (`.`, space, NBSP) are stripped; commas are treated as decimal separators.
+
+**🔗 Full example — model + form + table**
+
+```php
+// 1. Migration — store cents as integer
+$table->unsignedInteger('price'); // e.g. 1250 = €12.50
+
+// 2. Model — cast cents ↔ float automatically
+use Wdog\FilamentUnusual\Casts\MoneyCast;
+
+protected function casts(): array
+{
+    return ['price' => MoneyCast::class];
+}
+
+// 3. Filament resource form — edit the value as a formatted input
+use Wdog\FilamentUnusual\Forms\Components\MoneyInput;
+
+MoneyInput::make('price')->currency('EUR')->locale('it_IT'),
+
+// 4. Filament resource table — display the value as a formatted string
+use Wdog\FilamentUnusual\Tables\Columns\MoneyColumn;
+
+MoneyColumn::make('price')->currency('EUR')->locale('it_IT'),
+```
+
+`MoneyCast` sits in the middle: the DB column holds `1250`, the model exposes `12.50`, and both `MoneyInput` and `MoneyColumn` receive the float and format it for the user.
+
+---
+
+## 🛠️ Commands
+
+### `shield:prune-permissions`
+
+Deletes permissions from the database that are no longer registered in Filament Shield (orphaned permissions). Useful after removing resources, pages, or widgets.
+
+```bash
+php artisan shield:prune-permissions
+```
+
+**Options**
+
+| Option | Description |
+|--------|-------------|
+| `--panel=<id>` | Panel ID to resolve entities from. Defaults to the first registered panel. |
+| `--dry-run` | Lists orphaned permissions without deleting them. |
+
+**Examples**
+
+```bash
+# Preview what would be deleted
+php artisan shield:prune-permissions --dry-run
+
+# Delete orphaned permissions for a specific panel
+php artisan shield:prune-permissions --panel=admin
+
+# Delete all orphaned permissions (default panel)
+php artisan shield:prune-permissions
+```
+
+**What it considers valid**
+
+The command collects all valid permission names from:
+- Shield resources and their policy methods
+- Shield pages
+- Shield widgets
+- Custom permissions defined in `config/filament-shield.php`
+
+Any permission in the database that does not appear in this set is considered orphaned and will be deleted.
