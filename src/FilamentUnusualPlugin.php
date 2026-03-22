@@ -7,6 +7,13 @@ use Filament\Panel;
 use Wdog\FilamentUnusual\Panel\CalculatorFeature;
 use Wdog\FilamentUnusual\Panel\StatsFeature;
 
+/**
+ * FilamentUnusualPlugin — thin orchestrator.
+ *
+ * Registers optional panel features (topbar widgets) by delegating
+ * configuration and render-hook registration to dedicated feature classes.
+ * Each feature is only instantiated when its option is enabled.
+ */
 class FilamentUnusualPlugin implements Plugin
 {
     protected ?StatsFeature $statsFeature = null;
@@ -23,6 +30,20 @@ class FilamentUnusualPlugin implements Plugin
         return 'filament-unusual';
     }
 
+    /**
+     * Enable the stats dropdown in the panel topbar.
+     *
+     * Pass a closure to configure the feature:
+     *
+     * ```php
+     * ->showStats(fn (StatsFeature $stats) => $stats
+     *     ->withoutDefaultStats()
+     *     ->addStat('PHP', PHP_VERSION)
+     * )
+     * ```
+     *
+     * @param  bool|\Closure(StatsFeature): void  $condition
+     */
     public function showStats(bool|\Closure $condition = true): static
     {
         $enabled = is_bool($condition) ? $condition : true;
@@ -40,6 +61,9 @@ class FilamentUnusualPlugin implements Plugin
         return $this;
     }
 
+    /**
+     * Enable the calculator slide-over in the panel topbar.
+     */
     public function showCalculator(bool $condition = true): static
     {
         if ($condition) {
