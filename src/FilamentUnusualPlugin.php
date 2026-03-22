@@ -10,6 +10,7 @@ use Filament\View\PanelsRenderHook;
 class FilamentUnusualPlugin implements Plugin
 {
     protected bool $showStats = false;
+    protected bool $showCalculator = false;
 
     /** @var array<string> */
     protected array $disabledStats = [];
@@ -30,6 +31,14 @@ class FilamentUnusualPlugin implements Plugin
     public function showStats(bool $condition = true): static
     {
         $this->showStats = $condition;
+
+        return $this;
+    }
+
+
+    public function showCalculator(bool $condition = true): static
+    {
+        $this->showCalculator = $condition;
 
         return $this;
     }
@@ -80,10 +89,17 @@ class FilamentUnusualPlugin implements Plugin
 
             FilamentView::registerRenderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn () => view('filament-unusual::panel.stats-dropdown', [
+                fn() => view('filament-unusual::panel.stats-dropdown', [
                     'disabledStats' => $disabledStats,
                     'extraStats' => $extraStats,
                 ]),
+            );
+        }
+
+        if ($this->showCalculator) {
+            FilamentView::registerRenderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                fn() => view('filament-unusual::panel.calculator-button'),
             );
         }
     }

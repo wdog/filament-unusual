@@ -191,3 +191,73 @@
 .fi-stats-divider {
   @apply my-1 border-t border-gray-100 dark:border-white/10;
 }
+
+/* ── Calculator Sidebar ───────────────────────────────────────────────────── */
+
+.fi-calc-panel {
+  @apply fixed inset-y-0 end-0 z-50 flex flex-col ms-auto w-80 h-dvh bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-gray-950/10 dark:ring-white/10;
+}
+
+.fi-calc-header {
+  @apply flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10 shrink-0;
+}
+
+.fi-calc-close-btn {
+  @apply flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-white/10 transition-colors;
+}
+
+.fi-calc-history {
+  @apply flex flex-col flex-1 min-h-0 border-b border-gray-100 dark:border-white/10;
+}
+
+.fi-calc-history-header {
+  @apply flex items-center justify-between px-4 py-2 shrink-0;
+}
+
+.fi-calc-history-clear {
+  @apply text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+.fi-calc-history-list {
+  @apply flex-1 overflow-y-auto px-4 pb-2 space-y-1;
+}
+
+.fi-calc-history-item {
+  @apply flex flex-col w-full text-right text-sm py-1.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer;
+}
+
+.fi-calc-display-wrap {
+  @apply px-4 py-3 border-b border-gray-100 dark:border-white/10 shrink-0;
+}
+
+.fi-calc-display-expr {
+  @apply text-xs text-gray-400 dark:text-gray-600 text-right h-4 tabular-nums mb-1;
+}
+
+.fi-calc-display {
+  @apply w-full text-right text-2xl font-semibold tabular-nums bg-transparent text-gray-900 dark:text-white outline-none cursor-default placeholder-gray-300 dark:placeholder-gray-700;
+}
+
+.fi-calc-keyboard {
+  @apply grid grid-cols-4 gap-2 p-4 shrink-0;
+}
+
+.fi-calc-btn {
+  @apply flex items-center justify-center h-12 rounded-xl text-base font-medium bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 active:scale-95 transition-all cursor-pointer select-none;
+}
+
+.fi-calc-btn-operator {
+  @apply bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50;
+}
+
+.fi-calc-btn-equals {
+  @apply bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400;
+}
+
+.fi-calc-btn-clear {
+  @apply bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50;
+}
+
+.fi-calc-btn-action {
+  @apply bg-gray-200 dark:bg-white/15 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/25;
+}

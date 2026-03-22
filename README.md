@@ -8,6 +8,7 @@ Extra Filament components and Artisan commands for applications using [Filament 
 - [🚀 Installation](#-installation)
 - [🔌 Plugin options](#-plugin-options)
   - [📊 showStats()](#-showstats)
+  - [🧮 showCalculator()](#-showcalculator)
 - [🧩 Components](#-components)
   - [🔐 RolePermissionsSummary](#-rolepermissionssummary)
   - [📅 DatePickerColumn](#-datepickercolumn)
@@ -133,6 +134,37 @@ FilamentUnusualPlugin::make()
     ->withoutStats(['ram', 'laravel', 'filament', 'livewire']) // only load time in trigger
     ->addStat('PHP', PHP_VERSION)
 ```
+
+### 🧮 `showCalculator()`
+
+Injects a calculator button into the panel topbar, just before the global search input. Clicking it opens a slide-over panel from the right side of the screen.
+
+```php
+FilamentUnusualPlugin::make()->showCalculator(),
+```
+
+![Calculator](assets/calculator.gif)
+
+**Features**
+
+- Slide-over panel anchored to the right edge of the viewport
+- Scrollable history — click any past result to load it back into the display
+- **Clear history** button (disabled when history is empty)
+- Keyboard support:
+
+| Key | Action |
+|-----|--------|
+| `0`–`9`, `.` | Append digit / decimal |
+| `+` `-` `*` `/` | Append operator |
+| `Enter` / `=` | Calculate (only when an operator is present) |
+| `Backspace` | Delete last character |
+| `Delete` | Clear display (AC) |
+| `Escape` | Close the panel |
+
+> **Notes**
+> - Pressing `=` with no operator in the expression does nothing.
+> - Clicking the backdrop or the `✕` button closes the panel.
+> - The panel toggles open/closed on repeated button presses.
 
 ---
 
