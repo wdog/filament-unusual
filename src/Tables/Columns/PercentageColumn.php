@@ -22,7 +22,7 @@ class PercentageColumn extends Column implements HasEmbeddedView
 {
     /**
      * Filament semantic colour name ('primary', 'success', 'warning', 'danger',
-     * 'info', 'gray') or any raw CSS colour value (hex, rgb, etc.).
+     * 'info', 'gray'), or a raw CSS colour value (hex, rgb, hsl, var()).
      * null = automatic colour based on the value (red → amber → green).
      */
     protected string|Closure|null $color = null;
@@ -36,7 +36,7 @@ class PercentageColumn extends Column implements HasEmbeddedView
 
     /**
      * Bar fill colour.
-     * Accepts a Filament semantic colour name or any CSS colour.
+     * Accepts a Filament semantic colour name or a raw CSS colour value (hex, rgb, hsl, var()).
      * When null (default) the colour is chosen automatically:
      *   0–33 % → danger, 34–66 % → warning, 67–100 % → success.
      */
@@ -66,8 +66,8 @@ class PercentageColumn extends Column implements HasEmbeddedView
 
     /**
      * Returns an inline CSS colour value for the bar fill.
-     * Filament semantic colour names are mapped to their CSS custom property
-     * equivalents so the bar integrates with the active panel theme.
+     * Filament semantic colour names are resolved to their actual colour values
+     * via FilamentColor so the bar integrates with the active panel theme.
      */
     public function getBarColor(float $percentage): string
     {
@@ -99,19 +99,7 @@ class PercentageColumn extends Column implements HasEmbeddedView
             return $palette[$semanticShade] ?? $color;
         }
 
-        // Already a CSS value: hex (#6366f1), functional (rgb(), hsl()), or var().
-        if (str_starts_with($color, '#') || str_starts_with($color, 'var(') || str_contains($color, '(')) {
-            return $color;
-        }
-
-        // Tailwind color name without shade (e.g. 'green') → shade 500.
-        // Tailwind color name with shade (e.g. 'green-700') → that exact shade.
-        if (preg_match('/^[a-z]+(-\d+)?$/', $color)) {
-            return str_contains($color, '-')
-                ? "var(--color-{$color})"
-                : "var(--color-{$color}-500)";
-        }
-
+        // Raw CSS value: hex (#6366f1), functional (rgb(), hsl()), or var().
         return $color;
     }
 

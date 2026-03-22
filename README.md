@@ -274,7 +274,7 @@ PercentageColumn::make('completion'),
 
 | Method | Default | Description |
 |--------|---------|-------------|
-| `color(string\|Closure\|null)` | `null` (auto) | Bar fill colour. Accepts a Filament semantic name, a CSS value, or a Tailwind colour name. `null` = automatic. |
+| `color(string\|Closure\|null)` | `null` (auto) | Bar fill colour. Accepts a Filament semantic name or a raw CSS value. `null` = automatic. |
 | `decimals(int\|Closure)` | `0` | Decimal places shown in the label. |
 
 **Automatic colour thresholds (when `color()` is not set)**
@@ -290,8 +290,6 @@ PercentageColumn::make('completion'),
 | Format | Example |
 |--------|---------|
 | Filament semantic | `'success'`, `'danger'`, `'warning'`, `'info'`, `'primary'`, `'gray'` |
-| Tailwind name | `'green'` → `var(--color-green-500)` |
-| Tailwind name + shade | `'green-700'` → `var(--color-green-700)` |
 | CSS hex | `'#6366f1'` |
 | CSS functional | `'rgb(99 102 241)'` |
 | CSS custom property | `'var(--my-color)'` |
